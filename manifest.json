@@ -4681,42 +4681,6 @@
         "Archs": "x64"
       }
     },
-    "gmp": {
-      "Source": "CRAN",
-      "Repository": "https://packagemanager.posit.co/cran/latest",
-      "description": {
-        "Package": "gmp",
-        "Version": "0.7-4",
-        "Date": "2024-01-15",
-        "Title": "Multiple Precision Arithmetic",
-        "Author": "Antoine Lucas, Immanuel Scholz, Rainer Boehme <rb-gmp@reflex-studio.de>,\n  Sylvain Jasson <Sylvain.Jasson@inrae.fr>,\n  Martin Maechler <maechler@stat.math.ethz.ch>",
-        "Maintainer": "Antoine Lucas <antoinelucas@gmail.com>",
-        "Description": "Multiple Precision Arithmetic (big integers and rationals,\n prime number tests, matrix computation), \"arithmetic without limitations\"\n using the C library GMP (GNU Multiple Precision Arithmetic).",
-        "Depends": "R (>= 3.5.0)",
-        "Imports": "methods",
-        "Suggests": "Rmpfr, MASS, round",
-        "SystemRequirements": "gmp (>= 4.2.3)",
-        "License": "GPL (>= 2)",
-        "BuildResaveData": "no",
-        "LazyDataNote": "not available, as we use data/*.R *and* our classes",
-        "NeedsCompilation": "yes",
-        "URL": "https://forgemia.inra.fr/sylvain.jasson/gmp",
-        "Packaged": "2024-01-15 14:34:19 UTC; antoine",
-        "Repository": "RSPM",
-        "Date/Publication": "2024-01-15 15:50:07 UTC",
-        "Encoding": "UTF-8",
-        "Built": "R 4.2.0; x86_64-w64-mingw32; 2024-01-19 19:10:06 UTC; windows",
-        "ExperimentalWindowsRuntime": "ucrt",
-        "Archs": "x64",
-        "RemoteType": "standard",
-        "RemotePkgRef": "gmp",
-        "RemoteRef": "gmp",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
-        "RemoteReposName": "CRAN",
-        "RemotePkgPlatform": "x86_64-w64-mingw32",
-        "RemoteSha": "0.7-4"
-      }
-    },
     "goftest": {
       "Source": "CRAN",
       "Repository": "https://packagemanager.posit.co/cran/latest",
