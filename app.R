@@ -153,7 +153,7 @@ library(rmgarch)
 library(shinycssloaders)
 library(ichimoku)
 library(PerformanceAnalytics)
-library(PortfolioAnalytics)
+# library(PortfolioAnalytics)
 library(shinycustomloader)
 library(shinyjs)
 library(timetk)
@@ -19711,4 +19711,3 @@ shinyApp(ui, server)
 
 
 # # https://finance.yahoo.com/quote/A/sustainability/
-
