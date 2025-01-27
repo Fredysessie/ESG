@@ -10827,6 +10827,7 @@ ui <- page_navbar(
     useShinyjs(),
     tags$style(type="text/css", "body {padding-top: 40px;}"),
     tags$head(
+      tags$link(rel = "manifest", href = "/site.webmanifest", crossorigin = "use-credentials"),
       tags$style(HTML("
     #       .tab-content {
     #   margin-top: 20px;
