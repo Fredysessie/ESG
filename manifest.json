@@ -1082,38 +1082,6 @@
         "RemoteSha": "0.1.12"
       }
     },
-    "Rglpk": {
-      "Source": "CRAN",
-      "Repository": "https://packagemanager.posit.co/cran/latest",
-      "description": {
-        "Package": "Rglpk",
-        "Version": "0.6-5.1",
-        "Title": "R/GNU Linear Programming Kit Interface",
-        "Description": "R interface to the GNU Linear Programming Kit.\n  'GLPK' is open source software for solving large-scale linear programming (LP),\n  mixed integer linear programming ('MILP') and other related problems.",
-        "Authors@R": "c(person(\"Stefan\", \"Theussl\", role = c(\"aut\", \"cre\"), email = \"Stefan.Theussl@R-project.org\", comment = c(ORCID = \"0000-0002-6523-4620\")),\n             person(\"Kurt\", \"Hornik\", role = \"aut\", comment = c(ORCID = \"0000-0003-4198-9911\")),\n\t     person(\"Christian\", \"Buchta\", role = \"ctb\"),\n\t     person(\"Florian\", \"Schwendinger\", role = \"ctb\", comment = c(ORCID = \"0000-0002-3983-9773\")),\n\t     person(\"Heinrich\", \"Schuchardt\", role = \"ctb\"))",
-        "Depends": "slam (>= 0.1-9)",
-        "SystemRequirements": "GLPK library package (e.g., libglpk-dev on\nDebian/Ubuntu)",
-        "License": "GPL-2 | GPL-3",
-        "URL": "https://R-Forge.R-project.org/projects/rglp/,\nhttps://www.gnu.org/software/glpk/",
-        "NeedsCompilation": "yes",
-        "Packaged": "2024-01-13 15:39:28 UTC; hornik",
-        "Author": "Stefan Theussl [aut, cre] (<https://orcid.org/0000-0002-6523-4620>),\n  Kurt Hornik [aut] (<https://orcid.org/0000-0003-4198-9911>),\n  Christian Buchta [ctb],\n  Florian Schwendinger [ctb] (<https://orcid.org/0000-0002-3983-9773>),\n  Heinrich Schuchardt [ctb]",
-        "Maintainer": "Stefan Theussl <Stefan.Theussl@R-project.org>",
-        "Repository": "RSPM",
-        "Date/Publication": "2024-01-13 16:00:02 UTC",
-        "Encoding": "UTF-8",
-        "Built": "R 4.2.0; x86_64-w64-mingw32; 2024-01-20 18:55:47 UTC; windows",
-        "ExperimentalWindowsRuntime": "ucrt",
-        "Archs": "x64",
-        "RemoteType": "standard",
-        "RemotePkgRef": "Rglpk",
-        "RemoteRef": "Rglpk",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
-        "RemoteReposName": "CRAN",
-        "RemotePkgPlatform": "x86_64-w64-mingw32",
-        "RemoteSha": "0.6-5.1"
-      }
-    },
     "Rmpfr": {
       "Source": "CRAN",
       "Repository": "https://packagemanager.posit.co/cran/latest",
