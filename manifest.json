@@ -10469,40 +10469,6 @@
         "RemoteSha": "1.5.1"
       }
     },
-    "summaryBox": {
-      "Source": "github",
-      "Repository": null,
-      "description": {
-        "Package": "summaryBox",
-        "Type": "Package",
-        "Title": "Value and Info Boxes in Shiny Apps and Rmarkdown",
-        "Version": "0.1.0",
-        "Author": "person(\"Deepanshu\",\"Bhalla\",email=\"deepanshu88.us@gmail.com\",role=c(\"aut\"),comment=\"Original creator\")",
-        "Maintainer": "Deepanshu Bhalla <deepanshu88.us@gmail.com>",
-        "Description": "Value and Info Boxes in Shiny Apps and Rmarkdown",
-        "License": "GPL-2",
-        "Depends": "R (>= 3.1)",
-        "Imports": "htmltools, fontawesome",
-        "Encoding": "UTF-8",
-        "RoxygenNote": "7.1.1",
-        "Roxygen": "list(markdown = TRUE)",
-        "URL": "https://github.com/deepanshu88/SummaryBox/",
-        "BugReports": "https://github.com/deepanshu88/SummaryBox/issues/",
-        "RemoteType": "github",
-        "RemoteHost": "api.github.com",
-        "RemoteRepo": "summaryBox",
-        "RemoteUsername": "deepanshu88",
-        "RemoteRef": "HEAD",
-        "RemoteSha": "8cc2bb92d26da1dca15e3a1d5cade064a000cf1c",
-        "GithubRepo": "summaryBox",
-        "GithubUsername": "deepanshu88",
-        "GithubRef": "HEAD",
-        "GithubSHA1": "8cc2bb92d26da1dca15e3a1d5cade064a000cf1c",
-        "NeedsCompilation": "no",
-        "Packaged": "2024-12-15 20:36:26 UTC; koffi",
-        "Built": "R 4.2.2; ; 2024-12-15 20:36:27 UTC; windows"
-      }
-    },
     "survival": {
       "Source": "CRAN",
       "Repository": "https://packagemanager.posit.co/cran/latest",
@@ -12138,10 +12104,10 @@
       "checksum": "409c30258fb051f91897663f9e434e44"
     },
     ".Rprofile": {
-      "checksum": "09f90497f634b1796b5290786db29954"
+      "checksum": "5b7f2da9d3970b610136bd59bf51c993"
     },
     "app.R": {
-      "checksum": "19aab2be5c13b535c38ff512da94659d"
+      "checksum": "dadf13a66b82b4329a1302eb7a872555"
     },
     "benchmark_list_Euro.xlsx": {
       "checksum": "c570ecb623586ec5cbdbf955247ed9de"
