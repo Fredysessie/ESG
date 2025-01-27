@@ -408,39 +408,6 @@
         "RemoteSha": "2024.3-1"
       }
     },
-    "GenSA": {
-      "Source": "CRAN",
-      "Repository": "https://packagemanager.posit.co/cran/latest",
-      "description": {
-        "Package": "GenSA",
-        "Type": "Package",
-        "Title": "R Functions for Generalized Simulated Annealing",
-        "Version": "1.1.14",
-        "Date": "2024-01-22",
-        "Author": "Sylvain Gubian, Yang Xiang, Brian Suomela, Julia Hoeng, PMP SA.",
-        "Maintainer": "Sylvain Gubian <DL.RSupport@pmi.com>",
-        "Depends": "R (>= 2.12.0)",
-        "Description": "Performs search for global minimum of a very complex non-linear\n    objective function with a very large number of optima.",
-        "License": "GPL-2",
-        "LazyLoad": "yes",
-        "NeedsCompilation": "yes",
-        "Repository": "RSPM",
-        "RoxygenNote": "7.2.3",
-        "Packaged": "2024-01-22 11:15:05 UTC; sgubian",
-        "Date/Publication": "2024-01-22 14:23:05 UTC",
-        "Encoding": "UTF-8",
-        "Built": "R 4.2.0; x86_64-w64-mingw32; 2024-01-23 12:06:44 UTC; windows",
-        "ExperimentalWindowsRuntime": "ucrt",
-        "Archs": "x64",
-        "RemoteType": "standard",
-        "RemotePkgRef": "GenSA",
-        "RemoteRef": "GenSA",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
-        "RemoteReposName": "CRAN",
-        "RemotePkgPlatform": "x86_64-w64-mingw32",
-        "RemoteSha": "1.1.14"
-      }
-    },
     "GeneralizedHyperbolic": {
       "Source": "CRAN",
       "Repository": "https://packagemanager.posit.co/cran/latest",
@@ -747,44 +714,6 @@
         "RemoteSha": "2.0-8"
       }
     },
-    "PortfolioAnalytics": {
-      "Source": "CRAN",
-      "Repository": "https://packagemanager.posit.co/cran/latest",
-      "description": {
-        "Package": "PortfolioAnalytics",
-        "Type": "Package",
-        "Title": "Portfolio Analysis, Including Numerical Methods for Optimization\nof Portfolios",
-        "Authors@R": "c(\n    person(given=c(\"Brian\",\"G.\"),family=\"Peterson\",role=c(\"cre\",\"aut\",\"cph\"),\n    email=\"brian@braverock.com\") ,\n    person(given=\"Peter\",family=\"Carl\",role=c(\"aut\",\"cph\"),\n    email=\"peter@braverock.com\") ,\n    person(given=\"Ross\",family=\"Bennett\",role=c(\"ctb\",\"cph\")) ,\n    person(given=\"Kris\",family=\"Boudt\",role=c(\"ctb\",\"cph\")) ,\n    person(given=\"Xinran\",family=\"Zhao\",role=\"ctb\") ,\n    person(given=\"R. Douglas\",family=\"Martin\",role=\"ctb\") ,\n    person(given=\"Guy\",family=\"Yollin\",role=\"ctb\") ,\n    person(given=\"Hezky\",family=\"Varon\",role=\"ctb\") ,\n    person(given=\"Xiaokang\",family=\"Feng\",role=\"ctb\") ,\n    person(given=\"Yifu\",family=\"Kang\",role=\"ctb\") )",
-        "Version": "2.0.0",
-        "Date": "2024-07-03",
-        "Maintainer": "Brian G. Peterson <brian@braverock.com>",
-        "Description": "Portfolio optimization and analysis routines and graphics.",
-        "Depends": "R (>= 4.0.0), zoo, xts (>= 0.10-1), foreach,\nPerformanceAnalytics (>= 1.5.1)",
-        "Suggests": "quantmod, DEoptim (>= 2.2.1), iterators, fGarch, Rglpk,\nquadprog, ROI (>= 0.1.0), ROI.plugin.glpk (>= 0.0.2),\nROI.plugin.quadprog (>= 0.0.2), corpcor, testthat, nloptr (>=\n1.0.0), MASS, robustbase, osqp, CVXR, data.table, knitr,\nrmarkdown, GSE, RobStatTM, PCRA, R.rsp",
-        "VignetteBuilder": "R.rsp",
-        "Imports": "methods, GenSA, ROI.plugin.symphony, mco, pso",
-        "License": "GPL-3",
-        "URL": "https://github.com/braverock/PortfolioAnalytics",
-        "Copyright": "(c) 2004-2024",
-        "RoxygenNote": "7.3.2",
-        "Encoding": "UTF-8",
-        "NeedsCompilation": "yes",
-        "Packaged": "2024-07-03 18:05:30 UTC; brian",
-        "Author": "Brian G. Peterson [cre, aut, cph],\n  Peter Carl [aut, cph],\n  Ross Bennett [ctb, cph],\n  Kris Boudt [ctb, cph],\n  Xinran Zhao [ctb],\n  R. Douglas Martin [ctb],\n  Guy Yollin [ctb],\n  Hezky Varon [ctb],\n  Xiaokang Feng [ctb],\n  Yifu Kang [ctb]",
-        "Repository": "RSPM",
-        "Date/Publication": "2024-07-03 18:50:07 UTC",
-        "Built": "R 4.2.0; x86_64-w64-mingw32; 2024-07-04 04:59:21 UTC; windows",
-        "ExperimentalWindowsRuntime": "ucrt",
-        "Archs": "x64",
-        "RemoteType": "standard",
-        "RemotePkgRef": "PortfolioAnalytics",
-        "RemoteRef": "PortfolioAnalytics",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
-        "RemoteReposName": "CRAN",
-        "RemotePkgPlatform": "x86_64-w64-mingw32",
-        "RemoteSha": "2.0.0"
-      }
-    },
     "Quandl": {
       "Source": "CRAN",
       "Repository": "https://packagemanager.posit.co/cran/latest",
@@ -940,67 +869,6 @@
         "RemoteReposName": "CRAN",
         "RemotePkgPlatform": "x86_64-w64-mingw32",
         "RemoteSha": "1.98-1.16"
-      }
-    },
-    "ROI": {
-      "Source": "CRAN",
-      "Repository": "https://packagemanager.posit.co/cran/latest",
-      "description": {
-        "Package": "ROI",
-        "Version": "1.0-1",
-        "Title": "R Optimization Infrastructure",
-        "Authors@R": "c( person(\"Kurt\", \"Hornik\", role = \"aut\", email = \"Kurt.Hornik@R-project.org\", comment = c(ORCID = \"0000-0003-4198-9911\")),\n              person(\"David\", \"Meyer\", role = \"aut\"),\n              person(\"Florian\", \"Schwendinger\", role = \"aut\", email = \"FlorianSchwendinger@gmx.at\", comment = c(ORCID = \"0000-0002-3983-9773\")),\n              person(\"Stefan\", \"Theussl\", role = c(\"aut\", \"cre\"), email = \"Stefan.Theussl@R-Project.org\", comment = c(ORCID = \"0000-0002-6523-4620\")),\n              person(\"Diethelm\", \"Wuertz\", role = \"ctb\") )",
-        "Description": "The R Optimization Infrastructure ('ROI') <doi:10.18637/jss.v094.i15>\n\tis a sophisticated framework for handling optimization problems in R.\n\tAdditional information can be found on the 'ROI' homepage <https://roi.r-forge.r-project.org/>.",
-        "Depends": "R (>= 2.10)",
-        "Imports": "methods, registry (>= 0.5), slam, utils, checkmate",
-        "Suggests": "numDeriv",
-        "License": "GPL-3",
-        "Encoding": "UTF-8",
-        "URL": "https://roi.r-forge.r-project.org/,\nhttps://r-forge.r-project.org/projects/roi/",
-        "RoxygenNote": "7.2.3",
-        "NeedsCompilation": "no",
-        "Packaged": "2023-04-20 19:04:30 UTC; f",
-        "Author": "Kurt Hornik [aut] (<https://orcid.org/0000-0003-4198-9911>),\n  David Meyer [aut],\n  Florian Schwendinger [aut] (<https://orcid.org/0000-0002-3983-9773>),\n  Stefan Theussl [aut, cre] (<https://orcid.org/0000-0002-6523-4620>),\n  Diethelm Wuertz [ctb]",
-        "Maintainer": "Stefan Theussl <Stefan.Theussl@R-Project.org>",
-        "Repository": "RSPM",
-        "Date/Publication": "2023-04-20 19:42:30 UTC",
-        "Built": "R 4.2.0; ; 2024-01-23 05:39:56 UTC; windows",
-        "RemoteType": "standard",
-        "RemotePkgRef": "ROI",
-        "RemoteRef": "ROI",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
-        "RemoteReposName": "CRAN",
-        "RemotePkgPlatform": "x86_64-w64-mingw32",
-        "RemoteSha": "1.0-1"
-      }
-    },
-    "ROI.plugin.symphony": {
-      "Source": "CRAN",
-      "Repository": "https://packagemanager.posit.co/cran/latest",
-      "description": {
-        "Package": "ROI.plugin.symphony",
-        "Version": "1.0-0",
-        "Title": "'SYMPHONY' Plug-in for the 'R' Optimization Interface",
-        "Authors@R": "c(person(\"Stefan\", \"Theussl\", role = c(\"aut\", \"cre\"), email = \"Stefan.Theussl@R-Project.org\"))",
-        "Description": "Enhances the R Optimization Infrastructure ('ROI') package by registering\n\t     the 'SYMPHONY' open-source solver from the COIN-OR suite. It allows for\n\t     solving mixed integer linear programming (MILP) problems as well as all\n\t     variants/combinations of LP, IP.",
-        "Imports": "methods, ROI (>= 0.3-0), Rsymphony, slam",
-        "License": "GPL-3",
-        "URL": "http://roi.r-forge.r-project.org/,\nhttps://r-forge.r-project.org/projects/roi/",
-        "NeedsCompilation": "no",
-        "Packaged": "2020-08-30 18:25:51 UTC; f",
-        "Author": "Stefan Theussl [aut, cre]",
-        "Maintainer": "Stefan Theussl <Stefan.Theussl@R-Project.org>",
-        "Repository": "RSPM",
-        "Date/Publication": "2020-08-31 11:40:02 UTC",
-        "Encoding": "UTF-8",
-        "Built": "R 4.2.0; ; 2022-04-24 07:19:20 UTC; windows",
-        "RemoteType": "standard",
-        "RemotePkgRef": "ROI.plugin.symphony",
-        "RemoteRef": "ROI.plugin.symphony",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
-        "RemoteReposName": "CRAN",
-        "RemotePkgPlatform": "x86_64-w64-mingw32",
-        "RemoteSha": "1.0-0"
       }
     },
     "Rcpp": {
@@ -1320,39 +1188,6 @@
         "RemoteReposName": "CRAN",
         "RemotePkgPlatform": "x86_64-w64-mingw32",
         "RemoteSha": "1.16"
-      }
-    },
-    "Rsymphony": {
-      "Source": "CRAN",
-      "Repository": "https://packagemanager.posit.co/cran/latest",
-      "description": {
-        "Package": "Rsymphony",
-        "Version": "0.1-33",
-        "Title": "SYMPHONY in R",
-        "Description": "An R interface to the SYMPHONY solver for mixed-integer linear programs.",
-        "Authors@R": "c(person(\"Reinhard\", \"Harter\", role = \"aut\"),\n             person(\"Kurt\", \"Hornik\", role = c(\"aut\", \"cre\"),\n                    email = \"Kurt.Hornik@R-project.org\",\n                    comment = c(ORCID = \"0000-0003-4198-9911\")),\n             person(\"Stefan\", \"Theussl\", role = \"aut\"),\n             person(\"Cyrille\", \"Szymanski\", role = \"ctb\",\n                    email = \"cnszym@gmail.com\"),\n             person(\"Florian\", \"Schwendinger\", role = \"ctb\"))",
-        "License": "EPL",
-        "Depends": "R (>= 2.6.0)",
-        "Enhances": "slam, Matrix, SparseM",
-        "SystemRequirements": "SYMPHONY libraries and headers",
-        "URL": "https://R-Forge.R-project.org/projects/rsymphony,\nhttps://projects.coin-or.org/SYMPHONY,\nhttps://www.coin-or.org/download/source/SYMPHONY/",
-        "NeedsCompilation": "yes",
-        "Packaged": "2021-12-28 15:42:47 UTC; hornik",
-        "Author": "Reinhard Harter [aut],\n  Kurt Hornik [aut, cre] (<https://orcid.org/0000-0003-4198-9911>),\n  Stefan Theussl [aut],\n  Cyrille Szymanski [ctb],\n  Florian Schwendinger [ctb]",
-        "Maintainer": "Kurt Hornik <Kurt.Hornik@R-project.org>",
-        "Repository": "RSPM",
-        "Date/Publication": "2021-12-28 15:52:02 UTC",
-        "Encoding": "UTF-8",
-        "Built": "R 4.2.0; x86_64-w64-mingw32; 2024-01-23 01:36:32 UTC; windows",
-        "ExperimentalWindowsRuntime": "ucrt",
-        "Archs": "x64",
-        "RemoteType": "standard",
-        "RemotePkgRef": "Rsymphony",
-        "RemoteRef": "Rsymphony",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
-        "RemoteReposName": "CRAN",
-        "RemotePkgPlatform": "x86_64-w64-mingw32",
-        "RemoteSha": "0.1-33"
       }
     },
     "SQUAREM": {
@@ -4236,42 +4071,6 @@
         "RemoteSha": "1.0.0"
       }
     },
-    "foreach": {
-      "Source": "CRAN",
-      "Repository": "https://packagemanager.posit.co/cran/latest",
-      "description": {
-        "Package": "foreach",
-        "Type": "Package",
-        "Title": "Provides Foreach Looping Construct",
-        "Version": "1.5.2",
-        "Authors@R": "c(person(\"Folashade\", \"Daniel\", role=\"cre\", email=\"fdaniel@microsoft.com\"),\n             person(\"Hong\", \"Ooi\", role=\"ctb\"),\n             person(\"Rich\", \"Calaway\", role=\"ctb\"),\n             person(\"Microsoft\", role=c(\"aut\", \"cph\")),\n             person(\"Steve\", \"Weston\", role=\"aut\"))",
-        "Description": "Support for the foreach looping construct.  Foreach is an\n        idiom that allows for iterating over elements in a collection,\n        without the use of an explicit loop counter.  This package in\n        particular is intended to be used for its return value, rather\n        than for its side effects.  In that sense, it is similar to the\n        standard lapply function, but doesn't require the evaluation\n        of a function.  Using foreach without side effects also\n        facilitates executing the loop in parallel.",
-        "License": "Apache License (== 2.0)",
-        "URL": "https://github.com/RevolutionAnalytics/foreach",
-        "BugReports": "https://github.com/RevolutionAnalytics/foreach/issues",
-        "Depends": "R (>= 2.5.0)",
-        "Imports": "codetools, utils, iterators",
-        "Suggests": "randomForest, doMC, doParallel, testthat, knitr, rmarkdown",
-        "VignetteBuilder": "knitr",
-        "RoxygenNote": "7.1.1",
-        "Collate": "'callCombine.R' 'foreach.R' 'do.R' 'foreach-ext.R'\n'foreach-pkg.R' 'getDoPar.R' 'getDoSeq.R' 'getsyms.R' 'iter.R'\n'nextElem.R' 'onLoad.R' 'setDoPar.R' 'setDoSeq.R' 'times.R'\n'utils.R'",
-        "NeedsCompilation": "no",
-        "Packaged": "2022-01-11 04:21:12 UTC; fdaniel",
-        "Author": "Folashade Daniel [cre],\n  Hong Ooi [ctb],\n  Rich Calaway [ctb],\n  Microsoft [aut, cph],\n  Steve Weston [aut]",
-        "Maintainer": "Folashade Daniel <fdaniel@microsoft.com>",
-        "Repository": "RSPM",
-        "Date/Publication": "2022-02-02 09:20:02 UTC",
-        "Encoding": "UTF-8",
-        "Built": "R 4.2.0; ; 2024-01-23 03:34:32 UTC; windows",
-        "RemoteType": "standard",
-        "RemotePkgRef": "foreach",
-        "RemoteRef": "foreach",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
-        "RemoteReposName": "CRAN",
-        "RemotePkgPlatform": "x86_64-w64-mingw32",
-        "RemoteSha": "1.5.2"
-      }
-    },
     "forecast": {
       "Source": "CRAN",
       "Repository": "https://packagemanager.posit.co/cran/latest",
@@ -5968,37 +5767,6 @@
         "RemoteSha": "0.2.7"
       }
     },
-    "iterators": {
-      "Source": "CRAN",
-      "Repository": "https://packagemanager.posit.co/cran/latest",
-      "description": {
-        "Package": "iterators",
-        "Type": "Package",
-        "Title": "Provides Iterator Construct",
-        "Version": "1.0.14",
-        "Authors@R": "c(person(\"Folashade\", \"Daniel\", role=\"cre\", email=\"fdaniel@microsoft.com\"),\n             person(\"Revolution\", \"Analytics\", role=c(\"aut\", \"cph\")),\n             person(\"Steve\", \"Weston\", role=\"aut\"))",
-        "Description": "Support for iterators, which allow a programmer to traverse\n    through all the elements of a vector, list, or other collection of data.",
-        "URL": "https://github.com/RevolutionAnalytics/iterators",
-        "Depends": "R (>= 2.5.0), utils",
-        "Suggests": "RUnit, foreach",
-        "License": "Apache License (== 2.0)",
-        "NeedsCompilation": "no",
-        "Packaged": "2022-01-16 18:19:31 UTC; folashade",
-        "Author": "Folashade Daniel [cre],\n  Revolution Analytics [aut, cph],\n  Steve Weston [aut]",
-        "Maintainer": "Folashade Daniel <fdaniel@microsoft.com>",
-        "Repository": "RSPM",
-        "Date/Publication": "2022-02-05 00:50:08 UTC",
-        "Encoding": "UTF-8",
-        "Built": "R 4.2.0; ; 2024-01-23 01:23:19 UTC; windows",
-        "RemoteType": "standard",
-        "RemotePkgRef": "iterators",
-        "RemoteRef": "iterators",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
-        "RemoteReposName": "CRAN",
-        "RemotePkgPlatform": "x86_64-w64-mingw32",
-        "RemoteSha": "1.0.14"
-      }
-    },
     "jquerylib": {
       "Source": "CRAN",
       "Repository": "https://packagemanager.posit.co/cran/latest",
@@ -6700,39 +6468,6 @@
         "RemoteReposName": "CRAN",
         "RemotePkgPlatform": "x86_64-w64-mingw32",
         "RemoteSha": "0.9-8"
-      }
-    },
-    "mco": {
-      "Source": "CRAN",
-      "Repository": "https://packagemanager.posit.co/cran/latest",
-      "description": {
-        "Package": "mco",
-        "Version": "1.16",
-        "Title": "Multiple Criteria Optimization Algorithms and Related Functions",
-        "Description": "A collection of function to solve multiple criteria optimization problems \n  using genetic algorithms (NSGA-II). Also included is a collection of test functions.",
-        "Authors@R": "c(\n        person(\"Olaf\", \"Mersmann\", role=c(\"aut\", \"cre\"), email=\"olafm@p-value.net\"), \n\tperson(\"Heike\", \"Trautmann\", role=c(\"ctb\"), email=\"trautmann@wi.uni-muenster.de\"),\n        person(\"Detlef\", \"Steuer\", role=c(\"ctb\"), email=\"detlef.steuer@hsu-hamburg.de\"),\n\tperson(\"Bernd\", \"Bischl\", role=c(\"ctb\"), email=\"bernd_bischl@gmx.net\"),\n        person(\"Kalyanmoy\", \"Deb\", role=c(\"cph\")) )",
-        "Language": "en-US",
-        "Depends": "R (>= 3.0.0)",
-        "Suggests": "scatterplot3d, testthat",
-        "License": "GPL-2",
-        "URL": "https://github.com/olafmersmann/mco",
-        "Encoding": "UTF-8",
-        "NeedsCompilation": "yes",
-        "Packaged": "2024-01-11 07:38:29 UTC; olafm",
-        "Author": "Olaf Mersmann [aut, cre],\n  Heike Trautmann [ctb],\n  Detlef Steuer [ctb],\n  Bernd Bischl [ctb],\n  Kalyanmoy Deb [cph]",
-        "Maintainer": "Olaf Mersmann <olafm@p-value.net>",
-        "Repository": "RSPM",
-        "Date/Publication": "2024-01-11 08:03:03 UTC",
-        "Built": "R 4.2.0; x86_64-w64-mingw32; 2024-01-23 01:57:15 UTC; windows",
-        "ExperimentalWindowsRuntime": "ucrt",
-        "Archs": "x64",
-        "RemoteType": "standard",
-        "RemotePkgRef": "mco",
-        "RemoteRef": "mco",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
-        "RemoteReposName": "CRAN",
-        "RemotePkgPlatform": "x86_64-w64-mingw32",
-        "RemoteSha": "1.16"
       }
     },
     "memoise": {
@@ -8225,35 +7960,6 @@
         "RemoteSha": "1.7.7"
       }
     },
-    "pso": {
-      "Source": "CRAN",
-      "Repository": "https://packagemanager.posit.co/cran/latest",
-      "description": {
-        "Package": "pso",
-        "Version": "1.0.4",
-        "Date": "2022-04-12",
-        "Title": "Particle Swarm Optimization",
-        "Author": "Claus Bendtsen <papyrus.bendtsen@gmail.com>.",
-        "Maintainer": "Claus Bendtsen <papyrus.bendtsen@gmail.com>",
-        "Depends": "R (>= 2.10.0), methods",
-        "Suggests": "numDeriv, stats",
-        "Description": "Provides an implementation of particle swarm optimisation consistent with the standard PSO 2007/2011 by Maurice Clerc. Additionally a number of ancillary routines are provided for easy testing and graphics.",
-        "License": "LGPL-3",
-        "NeedsCompilation": "no",
-        "Packaged": "2022-04-12 12:56:40 UTC; kwzm106",
-        "Repository": "RSPM",
-        "Date/Publication": "2022-04-12 16:10:06 UTC",
-        "Encoding": "UTF-8",
-        "Built": "R 4.2.0; ; 2024-01-23 01:48:10 UTC; windows",
-        "RemoteType": "standard",
-        "RemotePkgRef": "pso",
-        "RemoteRef": "pso",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
-        "RemoteReposName": "CRAN",
-        "RemotePkgPlatform": "x86_64-w64-mingw32",
-        "RemoteSha": "1.0.4"
-      }
-    },
     "psych": {
       "Source": "CRAN",
       "Repository": "https://packagemanager.posit.co/cran/latest",
@@ -8703,35 +8409,6 @@
         "RemoteReposName": "CRAN",
         "RemotePkgPlatform": "x86_64-w64-mingw32",
         "RemoteSha": "1.1.0"
-      }
-    },
-    "registry": {
-      "Source": "CRAN",
-      "Repository": "https://packagemanager.posit.co/cran/latest",
-      "description": {
-        "Package": "registry",
-        "Type": "Package",
-        "Title": "Infrastructure for R Package Registries",
-        "Version": "0.5-1",
-        "Author": "David Meyer",
-        "Maintainer": "David Meyer <David.Meyer@R-project.org>",
-        "Description": "Provides a generic infrastructure for creating and using registries.",
-        "Depends": "R (>= 2.6.0)",
-        "Imports": "utils",
-        "License": "GPL-2",
-        "NeedsCompilation": "no",
-        "Packaged": "2019-03-05 12:35:44 UTC; meyer",
-        "Repository": "RSPM",
-        "Date/Publication": "2019-03-05 14:21:41 UTC",
-        "Encoding": "UTF-8",
-        "Built": "R 4.2.0; ; 2024-01-23 01:30:34 UTC; windows",
-        "RemoteType": "standard",
-        "RemotePkgRef": "registry",
-        "RemoteRef": "registry",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/latest",
-        "RemoteReposName": "CRAN",
-        "RemotePkgPlatform": "x86_64-w64-mingw32",
-        "RemoteSha": "0.5-1"
       }
     },
     "rematch": {
@@ -12104,10 +11781,10 @@
       "checksum": "409c30258fb051f91897663f9e434e44"
     },
     ".Rprofile": {
-      "checksum": "5b7f2da9d3970b610136bd59bf51c993"
+      "checksum": "88bb974600380e0391a9329fad1e969f"
     },
     "app.R": {
-      "checksum": "dadf13a66b82b4329a1302eb7a872555"
+      "checksum": "eb32f9caced979504f78d80e251e59e5"
     },
     "benchmark_list_Euro.xlsx": {
       "checksum": "c570ecb623586ec5cbdbf955247ed9de"
@@ -12125,7 +11802,7 @@
       "checksum": "a053f6209be0e0f54313848a3851f7c4"
     },
     "renv.lock": {
-      "checksum": "07394869751727c892ee6fb5c6ff7084"
+      "checksum": "812bcf0b96de10215195d1ab20c18c82"
     },
     "www/ESG-funds_Featured.jpg": {
       "checksum": "6fb739905fba70d598c9bade34e28c65"
