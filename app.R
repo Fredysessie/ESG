@@ -1,5 +1,12 @@
 # Forcing shinyapps.io to use latest versions of packages
+
+options(shiny.maxRequestSize = 30*1024^2)
+# https://www.morningstar.com/funds/xnas/awshx/quote
 # https://koffi-sessie.shinyapps.io/test_keystat/
+# https://www.capitalgroup.com/advisor/investments/fund/awshx
+# https://fundresearch.fidelity.com/mutual-funds/summary/939330106
+
+
 library(devtools)
 
 if (!requireNamespace("shiny", quietly = TRUE)) {
@@ -69,6 +76,9 @@ if (!requireNamespace("shinydashboard", quietly = TRUE)) {
 # Display a bar chart embedded into a data table (DT) in an rshiny app
 # https://towardsdatascience.com/top-7-packages-for-making-beautiful-tables-in-r-7683d054e541
 
+# devtools::install_github("Fredysessie/Financial.data")
+# library(Financial.data)
+
 library(bslib)
 library(caTools)
 library(MCMCpack)
@@ -76,8 +86,6 @@ library(rportfolio) #pour calculer le ratio d'information simple, alpha de jense
 library(sparkline)
 library(tibble)
 library(tidyquant)
-# devtools::install_github("Fredysessie/Financial.data")
-# library(Financial.data)
 library(shiny)
 # library(IntroCompFinR)
 library(fPortfolio)
@@ -153,7 +161,7 @@ library(rmgarch)
 library(shinycssloaders)
 library(ichimoku)
 library(PerformanceAnalytics)
-# library(PortfolioAnalytics)
+library(PortfolioAnalytics)
 library(shinycustomloader)
 library(shinyjs)
 library(timetk)
@@ -1329,7 +1337,56 @@ comp_graph_plot <- function(df, title = ""){
 }
 
 # Fonction pour calculer le Sharpe ratio modifié
+# calc_sresg <- function(sc, returns, rf, esg, type_return = "daily") {
+#   sc <- as.numeric(sc)
+#
+#   print('class rf')
+#   print(class(rf))
+#   print(dim(rf))
+#   print('class returns')
+#   print(class(returns))
+#   print(dim(returns))
+#   print('class esg')
+#   print(class(esg))
+#   print(dim(esg))
+#   # rf <- as.numeric(rf)
+#   annualization_factor <- switch(type_return,
+#                                  "daily" = 252,
+#                                  "weekly" = 52,
+#                                  "monthly" = 12,
+#                                  "yearly" = 1,
+#                                  stop("type_return doit être 'daily', 'weekly', 'monthly' ou 'yearly'"))
+#
+#   annualized_return <- mean(returns) * annualization_factor
+#   annualized_rf <- mean(rf) * annualization_factor
+#   annualized_volatility <- sd(returns) * sqrt(annualization_factor)
+#   sr <- (annualized_return - annualized_rf) / annualized_volatility
+#
+#   ifelse(sr > 0,
+#          sr * (1 + esg)^sc,
+#          sr * (1 + esg)^(-sc))
+# }
+
+# Fonction pour calculer le Sharpe ratio modifié
+# Nouvelle version
 calc_sresg <- function(sc, returns, rf, esg, type_return = "daily") {
+  # Vérification et conversion des données
+  sc <- as.numeric(sc)
+  returns <- as.numeric(returns)
+  rf <- as.numeric(rf)
+  esg <- as.numeric(esg)
+
+  # Suppression des NA
+  valid_indices <- complete.cases(returns, rf, esg)
+  returns <- returns[valid_indices]
+  rf <- rf[valid_indices]
+  esg <- esg[valid_indices]
+
+  # Vérification si les données sont suffisantes
+  if (length(returns) == 0 || length(rf) == 0 || length(esg) == 0) {
+    return(NA)
+  }
+
   annualization_factor <- switch(type_return,
                                  "daily" = 252,
                                  "weekly" = 52,
@@ -1337,9 +1394,13 @@ calc_sresg <- function(sc, returns, rf, esg, type_return = "daily") {
                                  "yearly" = 1,
                                  stop("type_return doit être 'daily', 'weekly', 'monthly' ou 'yearly'"))
 
-  annualized_return <- mean(returns) * annualization_factor
-  annualized_rf <- mean(rf) * annualization_factor
-  annualized_volatility <- sd(returns) * sqrt(annualization_factor)
+  annualized_return <- mean(returns, na.rm = TRUE) * annualization_factor
+  annualized_rf <- mean(rf, na.rm = TRUE) * annualization_factor
+  annualized_volatility <- sd(returns, na.rm = TRUE) * sqrt(annualization_factor)
+
+  # Vérification pour éviter la division par zéro
+  if (annualized_volatility == 0) return(NA)
+
   sr <- (annualized_return - annualized_rf) / annualized_volatility
 
   ifelse(sr > 0,
@@ -1348,9 +1409,57 @@ calc_sresg <- function(sc, returns, rf, esg, type_return = "daily") {
 }
 
 # Fonction à optimiser
+# Old version
+# optimize_sc <- function(sc, returns, rf, esg, type_return) {
+#   sresg <- calc_sresg(sc, returns, rf, esg, type_return)
+#   # Retourner le négatif du ratio de Sharpe (car la fonction optimize() minimise)
+#   return(as.numeric(-mean(sresg) / sd(sresg))) #new version
+#   # return(-mean(sresg) / sd(sresg))  # old version
+# }
+
+# # Fonction à optimiser avec vérification des données
+# optimize_sc <- function(sc, returns, rf, esg, type_return) {
+#   # Vérifier si les données sont numériques et non NA
+#   returns = as.numeric(returns)
+#   rf = as.numeric(rf)
+#   esg = as.numeric(esg)
+#
+#   if (!is.numeric(returns) || !is.numeric(rf) || !is.numeric(esg) ||
+#       any(is.na(returns)) || any(is.na(rf)) || any(is.na(esg))) {
+#     return(NA)
+#   }
+#
+#   sresg <- calc_sresg(sc, returns, rf, esg, type_return)
+#
+#   # Vérifier si sresg contient des valeurs valides
+#   if (length(sresg) == 0 || any(is.na(sresg)) || any(is.infinite(sresg))) {
+#     print("le calcul ne pourra aboutir car sresg contient un NA")
+#     return(NA)
+#   }
+#
+#   # Retourner le négatif du ratio de Sharpe
+#   -mean(sresg) / sd(sresg)
+# }
+
 optimize_sc <- function(sc, returns, rf, esg, type_return) {
   sresg <- calc_sresg(sc, returns, rf, esg, type_return)
-  return(-mean(sresg) / sd(sresg))  # Retourner le négatif du ratio de Sharpe (car la fonction optimize() minimise)
+
+  # Vérification si le calcul a produit des résultats valides
+  if (is.na(sresg) || is.infinite(sresg)) {
+    return(NA)
+  }
+
+  result <- tryCatch({
+    -mean(sresg, na.rm = TRUE) / sd(sresg, na.rm = TRUE)
+  }, error = function(e) {
+    NA
+  })
+
+  if (is.na(result) || is.infinite(result)) {
+    return(.Machine$double.xmax) # Retourne la plus grande valeur possible
+  }
+
+  return(result)
 }
 
 # Fonction pour calculer le Sharpe ratio modifié et ajouter les colonnes
@@ -7543,7 +7652,15 @@ best_analyze_pf_perf <- function(data,
   # Constants
   ANNUALIZATION_FACTORS <- c(daily = 252, weekly = 52, monthly = 12, yearly = 1)
   annualization_factor <- ANNUALIZATION_FACTORS[[type_return]]
-  rf_return <- rf / annualization_factor
+
+  # Fonction pour convertir le taux sans risque annuel
+  convert_rf_rate <- function(rf_annual, type_return) {
+    annualization_factor <- ANNUALIZATION_FACTORS[[type_return]]
+    rf_return <- (1 + rf_annual)^(1 / annualization_factor) - 1
+    return(rf_return)
+  }
+  rf_return <- convert_rf_rate(rf, type_return)
+  # rf_return <- rf / annualization_factor
 
   # Data preparation
   prepare_data <- function() {
@@ -7580,6 +7697,14 @@ best_analyze_pf_perf <- function(data,
 
   data_prep <- prepare_data()
 
+  # print('test sur (data_prep$ret_xts)')
+  # print(dim(data_prep$ret_xts))
+  # print(str(data_prep$ret_xts))
+  # print(summary(data_prep$ret_xts))
+  # print(data_prep$ret_xts)
+  # print(dput((data_prep$ret_xts)[,1]))
+
+
   # Portfolio calculations
   calculate_portfolio_metrics <- function(weights, mean_returns, cov_matrix, esg) {
     port_ret <- sum(weights * mean_returns)
@@ -7602,8 +7727,16 @@ best_analyze_pf_perf <- function(data,
   }
 
   # Main calculations
+  data_prep$ret_xts[is.na(data_prep$ret_xts)] <- 0
   mean_ret <- colMeans(data_prep$ret_xts)
+  # cov_mat <- cov(na.omit(data_prep$ret_xts)) * annualization_factor
   cov_mat <- cov(data_prep$ret_xts) * annualization_factor
+
+  # print("Matrice de covariance :")
+  # print(dim(cov_mat))
+  # print(summary(cov_mat))
+  # print(cov_mat)
+
   n_assets <- length(data_prep$tickers)
 
   # Normalize user weights if provided
@@ -7629,15 +7762,24 @@ best_analyze_pf_perf <- function(data,
     weights_matrix[1,] <- user_weights
   }
 
+
+
+
   # Calculate portfolio metrics for all simulations
   portfolio_metrics <- t(apply(weights_matrix, 1, calculate_portfolio_metrics,
                                mean_ret, cov_mat, data_prep$esg))
 
-  # Create results tibble
+  # Create results tibble old version
   portfolio_values <- as_tibble(cbind(
     weights_matrix,
     portfolio_metrics
   ))
+
+  # Create results tibble new version
+  # portfolio_values <- as_tibble(cbind(
+  #   weights_matrix,
+  #   apply(portfolio_metrics, 2, function(x) ifelse(is.finite(x), x, NA)) # Remplacement des valeurs infinies
+  # ))
 
   colnames(portfolio_values)[1:n_assets] <- data_prep$tickers
 
@@ -7683,7 +7825,7 @@ best_analyze_pf_perf <- function(data,
       scale_y_continuous(labels = scales::percent) +
       scale_x_continuous(labels = scales::percent) +
       labs(x = 'Annualized Risk', y = 'Annualized Returns',
-           title = "Portfolio Optimization & Efficient Frontier") +
+           title = "2D plot : Portfolio Optimization & Efficient Frontier") +
       # Point pour le portefeuille à variance minimale
       geom_point(data = min_var,
                  aes(x = Risk, y = Return),
@@ -7726,9 +7868,30 @@ best_analyze_pf_perf <- function(data,
 
     # Création des grilles pour la surface
     # Dans la fonction generate_plots()
-    max_risk <- max(portfolio_values[["Risk"]])
+    # max_risk <- max(portfolio_values[["Risk"]])
+    # Vérification de valeurs avant d'utiliser seq()
+    # print('summary RISK')
+    # print(summary(portfolio_values[["Risk"]]))
+    # print('summary ESG')
+    # print(summary(portfolio_values[["ESG"]]))
+
+    max_risk <- max(portfolio_values[["Risk"]], na.rm = TRUE)
+    min_esg <- min(portfolio_values[["ESG"]], na.rm = TRUE)
+    max_esg <- max(portfolio_values[["ESG"]], na.rm = TRUE)
+
+    # Vérification des valeurs avant de créer les séquences
+    if (!is.finite(max_risk) || !is.finite(min_esg) || !is.finite(max_esg)) {
+      warning("Non-finite values detected in portfolio metrics")
+      return(NULL)
+    }
+
+    # Génération des grilles
     risk_grid <- seq(0, max_risk, length.out = 50)
-    esg_grid <- seq(min(portfolio_values[["ESG"]]), max(portfolio_values[["ESG"]]), length.out = 50)
+    esg_grid <- seq(min_esg, max_esg, length.out = 50)
+
+    # risk_grid <- seq(0, max_risk, length.out = 50)
+    # esg_grid <- seq(min(portfolio_values[["ESG"]]), max(portfolio_values[["ESG"]]), length.out = 50)
+
 
     # Création de la matrice de rendements pour la surface tangente
     return_matrix <- outer(risk_grid, rep(1, length(esg_grid)), function(risk, esg) {
@@ -10812,6 +10975,11 @@ link_Gmail <- tags$a(
   # target = "_blank"
 )
 
+link_Portfolio <- tags$a(
+  shiny::icon("briefcase"), "Portfolio",
+  href = "https://koffi-sessie.shinyapps.io/Portfolio/"
+  # target = "_blank"
+)
 
 ui <- page_navbar(
   # theme = bs_theme(version = 5, bootswatch = "cosmo"),
@@ -10827,6 +10995,12 @@ ui <- page_navbar(
     useShinyjs(),
     tags$style(type="text/css", "body {padding-top: 40px;}"),
     tags$head(
+      # tags$script(
+      #   "$(document).on('shiny:disconnected', function(event) {
+      #   alert('Déconnecté du serveur. Veuillez rafraîchir la page.');
+      #   location.reload();
+      # })"
+      # ),
       tags$style(HTML("
     .justified-text {
       text-align: justify;
@@ -11100,7 +11274,7 @@ ui <- page_navbar(
                       style = "margin-bottom: 0;",
                       strong("Sous la supervision de :"),
                       br(),
-                      "Phillippe Gillet",
+                      "Philippe Gillet",
                       br(),
                       # "Maître de Conférences HC – HDR"
                       span(
@@ -11297,18 +11471,21 @@ ui <- page_navbar(
                 radioButtons(
                   inputId = "unik_stock_elm",
                   label = "Stock or Fund input method",
-                  choices = c("Select stock directly"= "Select",
+                  choices = c("Select stock/fund directly"= "Select",
                               "Use ISIN" = "Isin",
-                              "Search Stock" = "Entrance"),
+                              "Search Stock/Fund " = "Entrance"),
                   inline = FALSE # Afficher les boutons radio verticalement
                 ),
                 uiOutput("unik_esg_sbl_ui"),
-                actionButton("unik_run_button", "Submit"),
 
                 # Ancienne version test
                 # selectInput(
                 #   inputId = "esg_sbl", label = strong("Choose a stock"), c("", esg_etf_comparison$ticker)),
 
+                selectInput(inputId = "Benchmarks", label = strong("Select a benchmark"),
+                            c("", benchmark_list$Name),
+                            # options = list(maxOptions = 1700),
+                            selectize = TRUE),
                 # br(),
 
                 selectInput(inputId = "Rf_rate", label = strong("Select a risk free rate"), c("", risk_free_rate),
@@ -11319,6 +11496,15 @@ ui <- page_navbar(
                 #                start = "2020-01-06", end = (Sys.Date()-1)),
                 # Désactiver le choix des dates futures
 
+                checkboxInput(inputId = "benchmark", label = "Use risk free rate to calculate Sharpe ratio?", value = FALSE),
+
+                conditionalPanel(
+                  condition = "input.benchmark == false",
+                  numericInput(inputId = "rfrate_new",
+                               label = "Daily Risk Free Rate",
+                               value = 0.02, min = -100, max = 100, step = 0.01)
+                  # , align = center
+                ),
 
                 # # J'ai voulu permettre à l'utilisateur de choisir la source de ses données mais cette option sera utilisée dans le futur
                 # selectInput(inputId = "BNC_source", label = strong("Select data source"), c("Yahoo", "Euronext"),
@@ -11327,11 +11513,6 @@ ui <- page_navbar(
 
                 # # Dans l'UI, remplacer le selectInput statique par :
                 # uiOutput("benchmark_selector"),
-
-                selectInput(inputId = "Benchmarks", label = strong("Select a benchmark"),
-                            c("", benchmark_list$Name),
-                            # options = list(maxOptions = 1700),
-                            selectize = TRUE),
 
                 dateRangeInput(inputId = "date", # Ajout de l'id
                                label = strong("Analysis horizon"),
@@ -11347,6 +11528,25 @@ ui <- page_navbar(
                 # br(),
 
                 # sliderInput(inputId = "bins", label = strong("No. of histogram"), min = 1, max = 100, value=50),
+
+                # tags$br(),
+                selectInput(inputId = "retfreq", label = strong("Frequency of returns"), c("Daily" = "daily",
+                                                                                           "Weekly" = "weekly",
+                                                                                           "Monthly" = "monthly",
+                                                                                           "Yearly" = "yearly"),
+                            # freq_list,
+                            selected = "daily"),
+                # radioButtons("retfreq", "Frequency of returns", c("daily" = "daily",
+                #                                                   "weekly" = "weekly",
+                #                                                   "monthly" = "monthly",
+                #                                                   "yearly" = "yearly"), inline = T),
+                selectInput(inputId = "log", label = strong("Returns"), c("Arithmetic" = "arithmetic",
+                                                                          "Logarithmic" = "log"), selected = "arithmetic"),
+                # radioButtons("log", "Returns",
+                #              choices = c("Arithmetic" = "arithmetic",
+                #                          "Logarithmic" = "log"), inline = T),
+                # tags$br(),
+
                 colorPickr(inputId = "colour1", strong("Chart Colour"),
                            selected = "#27AD81",
                            swatches = c(
@@ -11366,38 +11566,11 @@ ui <- page_navbar(
                              clear = FALSE
                            ),
                            pickr_width = "245px"),
-                # tags$br(),
-                selectInput(inputId = "retfreq", label = strong("Frequency of returns"), c("Daily" = "daily",
-                                                                                           "Weekly" = "weekly",
-                                                                                           "Monthly" = "monthly",
-                                                                                           "Yearly" = "yearly"),
-                            # freq_list,
-                            selected = "daily"),
-                # radioButtons("retfreq", "Frequency of returns", c("daily" = "daily",
-                #                                                   "weekly" = "weekly",
-                #                                                   "monthly" = "monthly",
-                #                                                   "yearly" = "yearly"), inline = T),
-                selectInput(inputId = "log", label = strong("Returns"), c("Arithmetic" = "arithmetic",
-                                                                          "Logarithmic" = "log"), selected = "arithmetic"),
-                # radioButtons("log", "Returns",
-                #              choices = c("Arithmetic" = "arithmetic",
-                #                          "Logarithmic" = "log"), inline = T),
-                # tags$br(),
-
 
                 # numericInput("rfrate", "Risk Free Rate", value = 0.02, min = -100, max = 100, step = 0.01
                 #              # , align = center
                 #              ),
 
-                checkboxInput(inputId = "benchmark", label = "Use risk free rate to calculate Sharpe ratio?", value = FALSE),
-
-                conditionalPanel(
-                  condition = "input.benchmark == false",
-                  numericInput(inputId = "rfrate_new",
-                               label = "Daily Risk Free Rate",
-                               value = 0.02, min = -100, max = 100, step = 0.01)
-                  # , align = center
-                ),
                 checkboxInput(inputId = "sc_question", label = "Use the optimised smooth coefficient?", value = TRUE),
 
                 conditionalPanel(
@@ -11412,7 +11585,8 @@ ui <- page_navbar(
                             max = 0.2,
                             value = 0.10),
 
-                numericInput(inputId = "minaccret",label = strong("Minimum Acceptable Return"), value = 0, min = 0, max = 100, step = 0.01)
+                numericInput(inputId = "minaccret",label = strong("Minimum Acceptable Return"), value = 0, min = 0, max = 100, step = 0.01),
+                actionButton("unik_run_button", "Submit")
                 # ,
                 # selectInput("Up_Color", strong("Up Color"), str_to_title(my_color),selected = "Darkgreen", selectize = TRUE),
                 #   selectInput("Down_Color", strong("Down Color"), str_to_title(my_color), selected = "Red", selectize = TRUE)
@@ -11426,13 +11600,88 @@ ui <- page_navbar(
                   # id ="Main",
                   title = "Single ESG Analysis",
                   placement = "above",
-
-                  # well = TRUE,
-                  # width = "100%",
-                  # br(),
-                  # fluidRow(align = "center",
-                  #          selectInput("hideorshow", label = strong("Disposition du Sidebar"),
-                  #                      choices = c("Show", "Hide"), selected = "Show")),
+                  # nav_panel(
+                  #   title = "Aide",
+                  #   icon = icon("circle-question"),  # icône d'aide
+                  #   card(
+                  #     card_header("Bienvenue sur ESG Funds and stocks Dashboard"),
+                  #     card_body(
+                  #       h4("Comment utiliser cette plateforme"),
+                  #       tags$br(),
+                  #
+                  #       h5("1. Navigation générale"),
+                  #       p("La plateforme est organisée en plusieurs onglets principaux, chacun offrant des fonctionnalités spécifiques pour l'analyse ESG."),
+                  #
+                  #       h5("2. Analyse ESG"),
+                  #       tags$ul(
+                  #         tags$li(strong("Sélection des titres :"), " Vous pouvez choisir un titre de trois façons différentes :"),
+                  #         tags$ul(
+                  #           tags$li("Sélection directe dans la liste"),
+                  #           tags$li("Utilisation du code ISIN"),
+                  #           tags$li("Recherche par nom")
+                  #         ),
+                  #         tags$li(strong("Paramètres d'analyse :"), " Personnalisez votre analyse en ajustant :"),
+                  #         tags$ul(
+                  #           tags$li("Le taux sans risque"),
+                  #           tags$li("L'indice de référence"),
+                  #           tags$li("La période d'analyse"),
+                  #           tags$li("La fréquence des rendements")
+                  #         )
+                  #       ),
+                  #
+                  #       h5("3. Visualisation des résultats"),
+                  #       p("Les résultats sont présentés sous différents onglets :"),
+                  #       tags$ul(
+                  #         tags$li(strong("ESG Summary :"), " Vue d'ensemble des métriques ESG"),
+                  #         tags$li(strong("Data :"), " Données brutes et historiques"),
+                  #         tags$li(strong("Return :"), " Analyse des rendements"),
+                  #         tags$li(strong("Statistics :"), " Statistiques descriptives et les tests de Shapiro-Wilk, Jarque-Bera"),
+                  #         tags$li(strong("Indicator :"), " Indicateurs de performance où sont calculés les indicateurs de performance absolue et relative"),
+                  #         tags$li(strong("Model :"), " On y touve la Modélisation 3D de la rentabilité du titre ou du fond, le calcul du Sharpe Ratio, Modified Sharpe Ratio et prévisions")
+                  #       ),
+                  #
+                  #       tags$br(),
+                  #       h5("Besoin d'aide supplémentaire ?"),
+                  #       p("Pour toute question ou assistance, n'hésitez pas à contacter notre équipe support.")
+                  #     )
+                  #   )
+                  # ), #fin Notice
+                  nav_panel(
+                    title = "Help",
+                    icon = icon("circle-question"),
+                    card(
+                      card_header(
+                        div(
+                          class = "d-flex justify-content-between align-items-center",
+                          uiOutput("guide_title"),
+                          selectInput("language_choice",
+                                      label = NULL,
+                                      choices = c("English" = "EN", "Français" = "FR"),
+                                      selected = "EN",
+                                      width = "120px")
+                        )
+                      ),
+                      card_body(
+                        uiOutput("guide_content")
+                      )
+                    )
+                  ),
+                  # nav_panel(
+                  #   title = "Aide",
+                  #   icon = icon("circle-question"),
+                  #   card(
+                  #     card_header(
+                  #       div(
+                  #         class = "d-flex justify-content-between align-items-center",
+                  #         uiOutput("guide_title"),
+                  #         actionButton("toggle_language", "English Version", class = "btn-sm btn-primary")
+                  #       )
+                  #     ),
+                  #     card_body(
+                  #       uiOutput("guide_content")
+                  #     )
+                  #   )
+                  # ), #fin Notice
                   nav_panel("ESG Summary",
                             # br(),
                             layout_columns(
@@ -11616,7 +11865,7 @@ ui <- page_navbar(
                   inputId = "stock_elm",
                   label = "Choose stock input method",
                   # size = 'lg',
-                  choices = c("Select stock(s) directly"= "Select",
+                  choices = c("Select stock(s)/Fund(s) directly"= "Select",
                               "Use ISIN" = "Isin",
                               "Search Stock(s)" = "Entrance"),
                   # inline = TRUE # Ajout de l'option inline
@@ -11710,6 +11959,31 @@ ui <- page_navbar(
                 navset_card_pill(
                   title = "Stocks comparison tool",
                   placement = "above",
+                  nav_panel(
+                    title = "Help",
+                    icon = icon("circle-question"),
+                    card(
+                      card_header(
+                        # div(
+                        #   class = "d-flex justify-content-between align-items-center",
+                        #   uiOutput("guide_comparison_title"),
+                        #   actionButton("toggle_comparison_language", "English Version", class = "btn-sm btn-primary")
+                        # )
+                        div(
+                          class = "d-flex justify-content-between align-items-center",
+                          uiOutput("guide_comparison_title"),
+                          selectInput("comparison_language_choice",
+                                      label = NULL,
+                                      choices = c("English" = "EN", "Français" = "FR"),
+                                      selected = "EN",
+                                      width = "120px")
+                        )
+                      ),
+                      card_body(
+                        uiOutput("guide_comparison_content")
+                      )
+                    )
+                  ),
                   nav_panel("Sustainability", #"Sustainability  Overview"
 
                             # layout_columns(
@@ -11823,13 +12097,12 @@ ui <- page_navbar(
                 radioButtons(
                   inputId = "pf_stock_elm",
                   label = "Choose stock input method",
-                  choices = c("Select stock(s) directly"= "Select",
+                  choices = c("Select stock(s) or fund(s) directly"= "Select",
                               "Use ISIN(s)" = "Isin",
-                              "Search Stock(s)" = "Entrance"),
+                              "Search Stock(s) or Fund(s)" = "Entrance"),
                   inline = FALSE # Afficher les boutons radio verticalement
                 ),
                 uiOutput("db_esg_sbl_ui"),
-                actionButton("pf_run_button", "Submit"), # Ajouter un bouton d'action
 
                 selectInput("gp_Rf", strong("Select a risk free rate"), c("", risk_free_rate),
                             # selected = "OAT 5y",
@@ -11862,36 +12135,57 @@ ui <- page_navbar(
                   condition = "input.gp_benchmark == false",
                   #align = center not working,
                   numericInput("gp_rfrate_new",
-                               "Daily Risk Free Rate",
-                               value = 0.02,
+                               "Yearly Risk Free Rate",
+                               value = 0.05,
                                min = -100,
                                max = 100,
                                step = 0.01)
 
                 ),
-                checkboxInput("gp_sc_question", "Use the optimised smooth coefficient?", value = TRUE),
+                # checkboxInput("gp_sc_question", "Use the optimised smooth coefficient?", value = TRUE),
+                #
+                # conditionalPanel(
+                #   condition = "input.gp_sc_question == false",
+                #   numericInput("gp_sc", "Smooth coefficient", value = 0.05, min = 0, max = 1, step = 0.01)
+                #   # , align = center not working
+                # ),
 
-                conditionalPanel(
-                  condition = "input.gp_sc_question == false",
-                  numericInput("gp_sc", "Smooth coefficient", value = 0.05, min = 0, max = 1, step = 0.01)
-                  # , align = center not working
-                ),
+                # sliderInput(inputId = "gp_alpha",
+                #             label = strong("Significance level :"),
+                #             min = 0,
+                #             max = 0.2,
+                #             value = 0.10),
 
-                sliderInput(inputId = "gp_alpha",
-                            label = strong("Significance level :"),
-                            min = 0,
-                            max = 0.2,
-                            value = 0.10),
-
-                numericInput("gp_minaccret", "Minimum Acceptable Return", value = 0, min = 0, max = 100, step = 0.01)
+                numericInput("gp_minaccret", "Minimum Acceptable Return", value = 0, min = 0, max = 100, step = 0.01),
+                actionButton("pf_run_button", "Submit") # Ajouter un bouton d'action
 
               ), # Fin sidebar portofolio
               mainPanel(
                 class = "custom-mainPanel",
                 navset_card_pill(
-                  title = "Portfolio Performance Analysis",
+                  title = "Portfolio Analysis",
                   placement = "above",
                   id = "portfolioNavset",  # Ajout d'un id pour le navset
+                  nav_panel(
+                    title = "Help",
+                    icon = icon("circle-question"),
+                    card(
+                      card_header(
+                        div(
+                          class = "d-flex justify-content-between align-items-center",
+                          uiOutput("guide_portfolio_title"),
+                          selectInput("portfolio_language_choice",
+                                      label = NULL,
+                                      choices = c("English" = "EN", "Français" = "FR"),
+                                      selected = "EN",
+                                      width = "120px")
+                        )
+                      ),
+                      card_body(
+                        uiOutput("guide_portfolio_content")
+                      )
+                    )
+                  ),
                   nav_panel("Portfolio Summary",
                             # uiOutput("dynamic_weights"),  # Conteneur pour les champs de poids dynamiques
                             # textOutput("total_weight_text"), # Affichage du total des poids
@@ -11987,9 +12281,13 @@ ui <- page_navbar(
                                      column(3,
                                             selectizeInput("pf_minaccret",
                                                            "Min. Acceptable Return (in %)",
-                                                           choices = NULL,  # Important : initialiser avec NULL
-                                                           options = list(maxOptions = 20000),
-                                                           selected = 0)),
+                                                           # choices = NULL,  # Important : initialiser avec NULL
+                                                           # choices = round(seq(-100, 100, 0.01), 2),
+                                                           choices = sprintf("%.2f", seq(-100, 100, 0.01)),
+                                                           options = list(maxOptions = 20001),
+                                                           # selected = 0
+                                                           selected = "0.00"
+                                                           )),
                                      column(3, selectInput("pf_minaccESG", "Min. Acceptable ESG [0 ; 100]", c(0:100), multiple = FALSE, selected = 10)),
                                      column(3, selectInput("nb_portfolio", strong("Number of portfolio"), c(1:20), multiple = FALSE, selected = 1)),
                                      # column(3, selectInput(inputId = "alpha_level", label = strong("Significance level (%)"), seq(0, 10, 0.01), multiple = FALSE, selected = 5))
@@ -12075,7 +12373,8 @@ ui <- page_navbar(
     align = "right",
     nav_item(link_Gmail),
     nav_item(link_Github),
-    nav_item(link_Linkdin)
+    nav_item(link_Linkdin),
+    nav_item(link_Portfolio)
   ),
   nav_item(
     input_dark_mode(id = "dark_mode", mode = "light")
@@ -12132,11 +12431,22 @@ server <- function(input, output, session) {
 
     # Convertir les ratings en images HTML
     fund_data <- fund_data_clean %>%
+      # dplyr::mutate(
+      #   Rating = case_when(
+      #     # Rating == "Bronze" ~ '<img src="https://www.dupageseniorcouncil.org/wp-content/uploads/2018/02/Bronze-Icon-1.jpg" height="60">',
+      #     Rating == "Bronze" ~ '<img src="www/Bronze.jpg" height="60">',
+      #     # Rating == "Gold" ~ '<img src="https://www.dupageseniorcouncil.org/wp-content/uploads/2018/02/Gold-Icon.jpg" height="60">',
+      #     Rating == "Gold" ~ '<img src="www/Gold.jpg" height="60">',
+      #     # Rating == "Silver" ~ '<img src="https://www.dupageseniorcouncil.org/wp-content/uploads/2018/02/Silver-Icon-298x300.jpg" height="60">',
+      #     Rating == "Silver" ~ '<img src="www/Silver.jpg" height="60">',
+      #     TRUE ~ Rating
+      #   )
+      # )
       dplyr::mutate(
         Rating = case_when(
-          Rating == "Bronze" ~ '<img src="https://www.dupageseniorcouncil.org/wp-content/uploads/2018/02/Bronze-Icon-1.jpg" height="60">',
-          Rating == "Gold" ~ '<img src="https://www.dupageseniorcouncil.org/wp-content/uploads/2018/02/Gold-Icon.jpg" height="60">',
-          Rating == "Silver" ~ '<img src="https://www.dupageseniorcouncil.org/wp-content/uploads/2018/02/Silver-Icon-298x300.jpg" height="60">',
+          Rating == "Bronze" ~ sprintf('<img src="%s" height="60">', "Bronze.jpg"),
+          Rating == "Gold" ~ sprintf('<img src="%s" height="60">', "Gold.jpg"),
+          Rating == "Silver" ~ sprintf('<img src="%s" height="60">', "Silver.jpg"),
           TRUE ~ Rating
         )
       )
@@ -12196,13 +12506,585 @@ server <- function(input, output, session) {
   })
 
 
+  #############################
+  # PARTIE GUIDE
+  # # Variable réactive pour suivre la langue
+  # rv <- reactiveValues(language = "FR")
+  # # rv <- reactiveVal(list(language = "FR"))
+  #
+  # observeEvent(input$toggle_language, {
+  #   rv$language <- if(rv$language == "FR") "EN" else "FR"
+  #   updateActionButton(session, "toggle_language",
+  #                      label = if(rv$language == "FR") "English Version" else "Version française")
+  # })
+
+  output$guide_title <- renderUI({
+    if(input$language_choice == "FR") {
+      "Bienvenue dans l'onglet 'ESG ANALYSIS' du Dashboard"
+    } else {
+      # "Welcome to the 'ESG ANALYSIS' tab of the Dashboard"
+      "Welcome to the Dashboard's 'ESG ANALYSIS' tab."
+    }
+  })
+
+  output$guide_content <- renderUI({
+    # current <- rv()
+    # if(is.null(current$language)) return(NULL)
+    # if(current$language == "FR") {
+    # req(rv$language)  # S'assure que la valeur existe
+    if(input$language_choice == "FR") {
+    # if(rv$language == "FR") {
+    # if(rv$language == "FR") { #ligne 12293
+      # Version française
+      tagList(
+        div(
+          class = "alert alert-info",
+          icon("info-circle"),
+          strong(" Important : "),
+          "Veuillez lire attentivement cette notice avant de commencer votre analyse ESG. Elle contient des informations essentielles pour utiliser efficacement la plateforme."
+        ),
+        h4("Comment utiliser cette plateforme"),
+        tags$br(),
+
+        h5("1. Présentation de l'onglet 'ESG ANALYSIS'"),
+        p("Cet onglet vous permet d'effectuer une analyse approfondie des caractéristiques ESG (Environnementales, Sociales et de Gouvernance) de :"),
+        tags$ul(
+          tags$li(strong("Titres individuels"), " - Actions d'entreprises cotées"),
+          tags$li(strong("Fonds ESG"), " - Fonds d'investissement avec une orientation ESG")
+        ),
+
+        h5("2. Processus d'analyse ESG"),
+        p(strong("Étape 1 : Configuration dans le panneau latéral gauche")),
+        tags$ul(
+          tags$li(strong("Sélection des titres :"), " Dans le panneau latéral gauche, choisissez d'abord votre méthode de sélection :"),
+          tags$ul(
+            tags$li("'Select stock directly' - Pour choisir directement dans la liste déroulante"),
+            tags$li("'Use ISIN' - Pour entrer un code ISIN spécifique"),
+            tags$li("'Search Stock' - Pour rechercher un titre par son nom")
+          ),
+          tags$li(strong("Paramètres d'analyse :"), " Toujours dans le panneau latéral, configurez :"),
+          tags$ul(
+            tags$li("Le taux sans risque - Dans la liste déroulante 'Select a risk free rate'"),
+            tags$li("L'indice de référence - Dans 'Select a benchmark'"),
+            tags$li("La période d'analyse - Utilisez le sélecteur de dates 'Analysis horizon'"),
+            tags$li("La couleur des graphiques - Via le sélecteur 'Chart Colour'"),
+            tags$li("La fréquence des rendements - Dans 'Frequency of returns'"),
+            tags$li("Le type de rendement - Choisissez entre 'Arithmetic' ou 'Logarithmic'")
+          ),
+          tags$li(
+            div(
+              class = "alert alert-danger",
+              HTML("<strong style='color: red;'>IMPORTANT :</strong>"),
+              " Après avoir configuré tous les paramètres, cliquez sur le bouton ",
+              strong("'Submit'"),
+              " pour lancer l'analyse"
+            )
+          )
+          # tags$li(strong("IMPORTANT :"), " Après avoir configuré tous les paramètres, cliquez sur le bouton ", strong("'Submit'"), " pour lancer l'analyse")
+        ),
+
+        h5("3. Visualisation des résultats"),
+        p("Après avoir cliqué sur 'Submit', les résultats s'affichent dans les différents onglets :"),
+        tags$ul(
+          tags$li(strong("ESG Summary :"), " Vue d'ensemble des métriques ESG, incluant les scores environnementaux, sociaux et de gouvernance"),
+          tags$li(strong("Data :"), " Accès aux données brutes et historiques, permettant une analyse approfondie"),
+          tags$li(strong("Return :"), " Analyse détaillée des rendements avec graphiques et métriques de performance"),
+          tags$li(strong("Statistics :"), " Statistiques descriptives complètes incluant les tests de normalité (Shapiro-Wilk, Jarque-Bera)"),
+          tags$li(strong("Indicator :"), " Calcul et visualisation des indicateurs de performance absolue et relative"),
+          tags$li(strong("Model :"), " Analyse avancée comprenant :",
+                  tags$ul(
+                    tags$li("Modélisation 3D de la rentabilité"),
+                    tags$li("Calcul du Ratio de Sharpe classique et modifié"),
+                    tags$li("Outils de prévision et d'analyse des risques")
+                  ))
+        ),
+
+        h5("4. Personnalisation"),
+        p("Dans le panneau latéral, vous pouvez également :"),
+        tags$ul(
+          tags$li("Choisir les couleurs des graphiques"),
+          tags$li("Ajuster les paramètres statistiques"),
+          tags$li("Définir le niveau de signification et le rendement minimum acceptable")
+        ),
+
+        tags$br(),
+        h5("Besoin d'aide supplémentaire ?"),
+        p("Pour toute question ou assistance :",
+          tags$ul(
+            tags$li("Email : koffisessie@gmail.com"),
+            tags$li("Documentation complète disponible dans la section ressources"),
+            tags$li("FAQ accessible depuis le menu principal")
+          ))
+      )
+    } else {
+      # Version anglaise
+      tagList(
+        div(
+          class = "alert alert-info",
+          icon("info-circle"),
+          strong(" Important: "),
+          "Please read this guide carefully before starting your ESG analysis. It contains essential information for effectively using the platform."
+        ),
+        h4("How to Use This Platform"),
+        tags$br(),
+
+        h5("1. About the 'ESG ANALYSIS' Tab"),
+        p("This tab allows you to perform in-depth analysis of ESG (Environmental, Social, and Governance) characteristics for:"),
+        tags$ul(
+          tags$li(strong("Individual Securities"), " - Listed company stocks"),
+          tags$li(strong("ESG Funds"), " - Investment funds with an ESG focus")
+        ),
+
+        h5("2. ESG Analysis Process"),
+        p(strong("Step 1: Configuration in the Left Sidebar")),
+        tags$ul(
+          tags$li(strong("Stock Selection:"), " In the left sidebar, first choose your selection method:"),
+          tags$ul(
+            tags$li("'Select stock directly' - To choose from the dropdown list"),
+            tags$li("'Use ISIN' - To enter a specific ISIN code"),
+            tags$li("'Search Stock' - To search for a security by name")
+          ),
+          tags$li(strong("Analysis Parameters:"), " Still in the sidebar, configure:"),
+          tags$ul(
+            tags$li("Risk-free rate - In the 'Select a risk free rate' dropdown"),
+            tags$li("Benchmark - In 'Select a benchmark'"),
+            tags$li("Analysis period - Use the 'Analysis horizon' date picker"),
+            tags$li("Chart color - Via the 'Chart Colour' selector"),
+            tags$li("Returns frequency - In 'Frequency of returns'"),
+            tags$li("Return type - Choose between 'Arithmetic' or 'Logarithmic'")
+          ),
+          # tags$li(strong("IMPORTANT:"), " After setting all parameters, click the ", strong("'Submit'"), " button to launch the analysis")
+          tags$li(
+            div(
+              class = "alert alert-danger",
+              HTML("<strong style='color: red;'>IMPORTANT :</strong>"),
+              " After setting all parameters, click the ",
+              strong("'Submit'"),
+              " button to launch the analysis"
+            )
+          )
+        ),
+
+        h5("3. Results Visualization"),
+        p("After clicking 'Submit', results are displayed in different tabs:"),
+        tags$ul(
+          tags$li(strong("ESG Summary:"), " Overview of ESG metrics, including environmental, social, and governance scores"),
+          tags$li(strong("Data:"), " Access to raw and historical data for in-depth analysis"),
+          tags$li(strong("Return:"), " Detailed return analysis with performance charts and metrics"),
+          tags$li(strong("Statistics:"), " Comprehensive descriptive statistics including normality tests (Shapiro-Wilk, Jarque-Bera)"),
+          tags$li(strong("Indicator:"), " Calculation and visualization of absolute and relative performance indicators"),
+          tags$li(strong("Model:"), " Advanced analysis including:",
+                  tags$ul(
+                    tags$li("3D return modeling"),
+                    tags$li("Classical and modified Sharpe Ratio calculation"),
+                    tags$li("Forecasting and risk analysis tools")
+                  ))
+        ),
+
+        h5("4. Customization"),
+        p("In the sidebar, you can also:"),
+        tags$ul(
+          tags$li("Choose chart colors"),
+          tags$li("Adjust statistical parameters"),
+          tags$li("Set significance level and minimum acceptable return")
+        ),
+
+        tags$br(),
+        h5("Need Additional Help?"),
+        p("For questions or assistance:",
+          tags$ul(
+            tags$li("Email: koffisessie@gmail.com"),
+            tags$li("Complete documentation available in the resources section"),
+            tags$li("FAQ accessible from the main menu")
+          ))
+      )
+    }
+  })
+
+
+  # # Variable réactive pour la langue
+  # rv <- reactiveValues(comparison_language = "FR")
+  #
+  # # Observer pour le bouton de changement de langue
+  # observeEvent(input$toggle_comparison_language, {
+  #   rv$comparison_language <- if(rv$comparison_language == "FR") "EN" else "FR"
+  #   updateActionButton(session, "toggle_comparison_language",
+  #                      label = if(rv$comparison_language == "FR") "English Version" else "Version française")
+  # })
+
+  # Titre dynamique
+  output$guide_comparison_title <- renderUI({
+    if(input$comparison_language_choice == "FR") {
+      "Guide d'utilisation de l'outil de comparaison des fonds ESG"
+    } else {
+      "User guide for ESG Funds comparison tool"
+    }
+  })
+
+  # Titre dynamique
+  # output$guide_comparison_title <- renderUI({
+  #   if(rv$comparison_language == "FR") {
+  #     "Guide d'utilisation de l'outil de comparaison des fonds ESG"
+  #   } else {
+  #     "User Guide for ESG Funds Comparison Tool"
+  #   }
+  # })
+
+  # Contenu du guide
+  output$guide_comparison_content <- renderUI({
+    if(input$comparison_language_choice == "FR") {
+    # if(rv$comparison_language == "FR") {
+      # Version française
+      tagList(
+        div(
+          class = "alert alert-info",
+          icon("info-circle"),
+          strong(" Important : "),
+          "Veuillez lire attentivement ce guide pour tirer le meilleur parti de notre outil de comparaison avancé."
+        ),
+
+        h4("Pourquoi choisir notre plateforme ?"),
+        p("Contrairement aux plateformes traditionnelles comme Yahoo Finance qui limitent l'analyse à un seul titre ou fond à la fois, notre dashboard vous permet de :"),
+        tags$ul(
+          tags$li("Comparer simultanément plusieurs fonds ou titres ESG"),
+          tags$li("Visualiser côte à côte les métriques clés pour une prise de décision éclairée"),
+          tags$li("Accéder à des analyses comparatives avancées en un seul clic")
+        ),
+
+        h5("1. Fonctionnalités principales"),
+        p("L'onglet 'FUNDS COMPARISON' offre trois axes d'analyse majeurs :"),
+        tags$ul(
+          tags$li(strong("Sustainability"), " - Comparaison détaillée des critères ESG et de durabilité"),
+          tags$li(strong("Keys Stats"), " - Analyse comparative des indicateurs financiers clés :"),
+          tags$ul(
+            tags$li("Current Valuation Measures"),
+            tags$li("Financial Highlights"),
+            tags$li("Trading Information")
+          ),
+          tags$li(strong("Graph tool"), " - Visualisation graphique comparative :"),
+          tags$ul(
+            tags$li("Profitabilité"),
+            tags$li("Capitalisation boursière et valeur d'entreprise"),
+            tags$li("Flux de trésorerie"),
+            tags$li("EBITDA"),
+            tags$li("Et bien plus encore...")
+          )
+        ),
+
+        h5("2. Comment utiliser l'outil"),
+        p(strong("Étape 1 : Sélection des titres")),
+        tags$ul(
+          tags$li("Utilisez le panneau latéral gauche pour choisir vos titres/fonds"),
+          tags$li("Trois méthodes de sélection disponibles :",
+                  tags$ul(
+                    tags$li("'Select stock(s) or Fund(s) directly' - Sélection directe dans la liste"),
+                    # tags$li("'Use ISIN' - Recherche par code ISIN"),
+                    tags$li("'Use ISIN' - Recherche par code ISIN. Pour comparer plusieurs ISINs, séparez-les par des virgules. ",
+                            strong("Exemple : US9393301067,NL0006294035,US67066G1040"), " ou " , strong("US9393301067, NL0006294035, US67066G1040")),
+                    # tags$li("'Search Stock(s)' - Recherche par nom")
+                    tags$li("'Search Stock(s)' - Recherche par nom. Pour comparer plusieurs tickers, séparez-les par des virgules. ",
+                            strong("Exemple : META,AAPL,NVDA"), " ou " , strong("META, AAPL, NVDA"))
+                  )),
+          tags$li("Personnalisez l'apparence du tableau de comparaison en modifiant 'Overview table Colour' (couleur par défaut : '#27AD81')")
+        ),
+
+        div(
+          class = "alert alert-danger",
+          HTML("<strong style='color: red;'>IMPORTANT :</strong>"),
+          " Après avoir sélectionné vos titres/fonds, cliquez sur le bouton ",
+          strong("'Run'"),
+          " pour lancer l'analyse comparative"
+        ),
+
+        h5("3. Source des données"),
+        p("Nos données proviennent de Yahoo Finance, garantissant :"),
+        tags$ul(
+          tags$li("Des informations fiables et à jour"),
+          tags$li("Une large couverture des marchés"),
+          tags$li("Des données financières précises")
+        ),
+
+        tags$br(),
+        h5("Besoin d'aide ?"),
+        p("Pour toute question : koffisessie@gmail.com")
+      )
+    } else {
+      # Version anglaise
+      tagList(
+        div(
+          class = "alert alert-info",
+          icon("info-circle"),
+          strong(" Important: "),
+          "Please read this guide carefully to make the most of our advanced comparison tool."
+        ),
+
+        h4("Why Choose Our Platform?"),
+        p("Unlike traditional platforms like Yahoo Finance that limit analysis to one security or fund at a time, our dashboard allows you to:"),
+        tags$ul(
+          tags$li("Compare multiple ESG funds or securities simultaneously"),
+          tags$li("View key metrics side by side for informed decision-making"),
+          tags$li("Access advanced comparative analyses with a single click")
+        ),
+
+        h5("1. Main Features"),
+        p("The 'FUNDS COMPARISON' tab offers three major analysis axes:"),
+        tags$ul(
+          tags$li(strong("Sustainability"), " - Detailed comparison of ESG and sustainability criteria"),
+          tags$li(strong("Keys Stats"), " - Comparative analysis of key financial indicators:"),
+          tags$ul(
+            tags$li("Current Valuation Measures"),
+            tags$li("Financial Highlights"),
+            tags$li("Trading Information")
+          ),
+          tags$li(strong("Graph tool"), " - Comparative graphical visualization:"),
+          tags$ul(
+            tags$li("Profitability"),
+            tags$li("Market cap and enterprise value"),
+            tags$li("Cash flow"),
+            tags$li("EBITDA"),
+            tags$li("And much more...")
+          )
+        ),
+
+        h5("2. How to Use the Tool"),
+        p(strong("Step 1: Security Selection")),
+        tags$ul(
+          tags$li("Use the left sidebar to choose your securities/funds"),
+          tags$li("Three selection methods available:",
+                  tags$ul(
+                    tags$li("'Select stock(s) or Fund(s) directly' - Direct selection from the list"),
+                    # tags$li("'Use ISIN' - Search by ISIN code"),
+                    tags$li("'Use ISIN' - Search by ISIN code. To compare multiple ISINs, separate them with commas. ",
+                            strong("Example: US9393301067,NL0006294035,US67066G1040"), " or ", strong("US9393301067, NL0006294035, US67066G1040")),
+                    # tags$li("'Search Stock(s) or Funds(s)' - Search by name")
+                    tags$li("'Search Stock(s) or Funds(s)' - Search by name. To compare multiple tickers, separate them with commas. ",
+                            strong("Example: META,AAPL,NVDA"), " or ", strong("META, AAPL, NVDA"))
+                  )),
+          tags$li("Customize the comparison table appearance by modifying 'Overview table Colour' (default color: '#27AD81')")
+        ),
+
+        div(
+          class = "alert alert-danger",
+          HTML("<strong style='color: red;'>IMPORTANT:</strong>"),
+          " After selecting your securities/funds, click the ",
+          strong("'Run'"),
+          " button to launch the comparative analysis"
+        ),
+
+        h5("3. Data Source"),
+        p("Our data comes from Yahoo Finance, ensuring:"),
+        tags$ul(
+          tags$li("Reliable and up-to-date information"),
+          tags$li("Broad market coverage"),
+          tags$li("Accurate financial data")
+        ),
+
+        tags$br(),
+        h5("Need Help?"),
+        p("For any questions: koffisessie@gmail.com")
+      )
+    }
+  })
+
+  # PORTFOLIO
+  output$guide_portfolio_title <- renderUI({
+    if(input$portfolio_language_choice == "FR") {
+      "Guide d'utilisation de l'outil de gestion de portefeuille"
+    } else {
+      "Portfolio Management Tool user guide"
+    }
+  })
+
+  output$guide_portfolio_content <- renderUI({
+    if(input$portfolio_language_choice == "FR") {
+      # Version française
+      tagList(
+        div(
+          class = "alert alert-info",
+          icon("info-circle"),
+          strong(" Important : "),
+          "Ce guide vous aidera à tirer le meilleur parti des fonctionnalités de gestion de portefeuille."
+        ),
+
+        h4("Présentation de l'outil"),
+        p("L'onglet 'PORTFOLIO' offre deux fonctionnalités principales :"),
+        tags$ul(
+          tags$li(strong("Analyse d'un portefeuille individuel")),
+          tags$li(strong("Comparaison de plusieurs portefeuilles"))
+        ),
+
+        h5("1. Analyse d'un portefeuille individuel"),
+        p("Cette analyse se décompose en trois sections :"),
+        tags$ul(
+          tags$li(strong("Portfolio Summary"), " - Vue d'ensemble de votre portefeuille :",
+                  tags$ul(
+                    tags$li("Visualisation des performances"),
+                    tags$li("Allocation des poids par titre/fond"),
+                    tags$li("Analyse des rendements")
+                  )),
+          tags$li(strong("Data"), " - Accès aux données brutes :",
+                  tags$ul(
+                    tags$li("Données historiques"),
+                    tags$li("Matrice des variances-covariances")
+                  )),
+          tags$li(strong("Modelization"), " - Outils d'optimisation :",
+                  tags$ul(
+                    tags$li("Poids optimisés pour maximiser les gains"),
+                    tags$li("Frontière d'efficience en 2D et 3D"),
+                    tags$li("Carte thermique de la variance-covariance"),
+                    tags$li("Portefeuille tangent"),
+                    tags$li("Portefeuille à variance minimale")
+                  ))
+        ),
+
+        div(
+          class = "alert alert-danger",
+          HTML("<strong style='color: red;'>IMPORTANT :</strong>"),
+          " Pour commencer votre analyse, sélectionnez d'abord vos titres/fonds dans le panneau latéral gauche, puis cliquez sur 'Submit'"
+        ),
+
+        h5("2. Comparaison de portefeuilles"),
+        p("L'onglet 'Portfolio comparison' permet de comparer plusieurs portefeuilles simultanément."),
+        p("Étapes à suivre :"),
+        tags$ol(
+          tags$li("Choisir le nombre de portefeuilles à comparer"),
+          tags$li("Configurer les paramètres :",
+                  tags$ul(
+                    tags$li("Type de rendement (Arithmétique/Logarithmique)"),
+                    tags$li("Coefficient de lissage"),
+                    tags$li("Seuil de significativité"),
+                    tags$li("Horizon d'analyse")
+                  )),
+          tags$li("Cliquer sur 'Generate User weights'"),
+          tags$li("Compléter les informations demandées")
+        ),
+
+        h5("3. Métriques calculées"),
+        p("Les analyses incluent les indicateurs suivants :"),
+        tags$ul(
+          tags$li("Rendement et Risque Annuels"),
+          tags$li("Value at Risk (VaR)"),
+          tags$li("Ratios de performance :",
+                  tags$ul(
+                    tags$li("Sharpe et Sharpe Modifié"),
+                    tags$li("Information et Information Modifié"),
+                    tags$li("Sortino")
+                  )),
+          tags$li("Indicateurs de risque :",
+                  tags$ul(
+                    tags$li("Bêta (global, haussier, baissier)"),
+                    tags$li("Erreur de Suivi"),
+                    tags$li("Alpha de Jensen")
+                  )),
+          tags$li("Statistiques de distribution :",
+                  tags$ul(
+                    tags$li("Asymétrie"),
+                    tags$li("Kurtosis"),
+                    tags$li("Test de Jarque-Bera")
+                  ))
+        )
+      )
+    } else {
+      # English version
+      tagList(
+        div(
+          class = "alert alert-info",
+          icon("info-circle"),
+          strong(" Important: "),
+          "This guide will help you make the most of the portfolio management features."
+        ),
+
+        h4("Tool Overview"),
+        p("The 'PORTFOLIO' tab offers two main functionalities:"),
+        tags$ul(
+          tags$li(strong("Individual portfolio analysis")),
+          tags$li(strong("Multiple portfolio comparison"))
+        ),
+
+        h5("1. Individual Portfolio Analysis"),
+        p("This analysis is divided into three sections:"),
+        tags$ul(
+          tags$li(strong("Portfolio Summary"), " - Portfolio overview:",
+                  tags$ul(
+                    tags$li("Performance visualization"),
+                    tags$li("Asset weight allocation"),
+                    tags$li("Returns analysis")
+                  )),
+          tags$li(strong("Data"), " - Access to raw data:",
+                  tags$ul(
+                    tags$li("Historical data"),
+                    tags$li("Variance-covariance matrix")
+                  )),
+          tags$li(strong("Modelization"), " - Optimization tools:",
+                  tags$ul(
+                    tags$li("Optimized weights for maximum gains"),
+                    tags$li("2D and 3D efficient frontier"),
+                    tags$li("Variance covariance Heatmap"),
+                    tags$li("Tangency portfolio"),
+                    tags$li("Minimum variance portfolio")
+                  ))
+        ),
+
+        div(
+          class = "alert alert-danger",
+          HTML("<strong style='color: red;'>IMPORTANT:</strong>"),
+          " To begin your analysis, first select your securities/funds in the left sidebar, then click 'Submit'"
+        ),
+
+        h5("2. Portfolio Comparison"),
+        p("The 'Portfolio comparison' tab allows you to compare multiple portfolios simultaneously."),
+        p("Steps to follow:"),
+        tags$ol(
+          tags$li("Choose the number of portfolios to compare"),
+          tags$li("Configure parameters:",
+                  tags$ul(
+                    tags$li("Return type (Arithmetic/Logarithmic)"),
+                    tags$li("Smooth coefficient"),
+                    tags$li("Significance level"),
+                    tags$li("Analysis horizon")
+                  )),
+          tags$li("Click 'Generate User weights'"),
+          tags$li("Complete the requested information")
+        ),
+
+        h5("3. Calculated Metrics"),
+        p("The analyses include the following indicators:"),
+        tags$ul(
+          tags$li("Annual Return and Risk"),
+          tags$li("Value at Risk (VaR)"),
+          tags$li("Performance ratios:",
+                  tags$ul(
+                    tags$li("Sharpe and Modified Sharpe"),
+                    tags$li("Information and Modified Information"),
+                    tags$li("Sortino")
+                  )),
+          tags$li("Risk indicators:",
+                  tags$ul(
+                    tags$li("Beta (overall, bullish, bearish)"),
+                    tags$li("Tracking Error"),
+                    tags$li("Jensen's Alpha")
+                  )),
+          tags$li("Distribution statistics:",
+                  tags$ul(
+                    tags$li("Skewness"),
+                    tags$li("Kurtosis"),
+                    tags$li("Jarque-Bera Test")
+                  ))
+        )
+      )
+    }
+  })
+
   ############################
   observe({
     # Pour pf_minaccret
     updateSelectizeInput(session,
                          "pf_minaccret",
-                         choices = seq(-100, 100, 0.01),
-                         selected = 0,
+                         # choices = seq(-100, 100, 0.01),
+                         # choices = round(seq(-100, 100, 0.01), 2),
+                         choices = sprintf("%.2f", seq(-100, 100, 0.01)),
+                         # selected = 0,
+                         selected = "0.00",
                          server = TRUE)
   })
 
@@ -12250,9 +13132,9 @@ server <- function(input, output, session) {
             selectInput(
               inputId = paste0("cmp_pf_stock_elm_", i),
               label = "Stock input method",
-              choices = c("Select stock(s) directly" = "Select",
+              choices = c("Select stock(s) or Fund(s) directly" = "Select",
                           "Use ISIN(s)" = "Isin",
-                          "Search Stock(s)" = "Entrance")
+                          "Search Stock(s) or Fund(s)" = "Entrance")
             ),
             uiOutput(paste0("db_esg_sbl_ui_", i)),
             selectInput(paste0("pf_Rf_", i), strong("Select a risk free rate"), c("", risk_free_rate)),
@@ -13039,7 +13921,7 @@ server <- function(input, output, session) {
           # JB_Test.decision = metrics$pf_jb_test.decision
         )
 
-        df_[, -1] <- round(df_[, -1], 6)
+        df_[, -1] <- round(df_[, -1], 4)
 
         # names(df_) = c("Portfolio", "Annual return", "Annual Risk",
         #                   "VaR", "Tracking Error", "Beta",	"Sharpe Ratio",
@@ -13739,7 +14621,7 @@ server <- function(input, output, session) {
   output$cmp_esg_sbl_ui <- renderUI({
     if (input$stock_elm == "Select") {
       selectInput(
-        "cmp_esg_sbl", strong("Choose stock(s)"),
+        "cmp_esg_sbl", strong("Choose stock(s) or Fund(s)"),
         c("", esg_etf_comparison$ticker),
         multiple = TRUE,
         selected = '',
@@ -15475,7 +16357,7 @@ server <- function(input, output, session) {
   output$unik_esg_sbl_ui <- renderUI({
     if (input$unik_stock_elm == "Select") {
       selectInput(
-        "esg_sbl", strong("Choose stock"),
+        "esg_sbl", strong("Choose Stock or Fund"),
         c("", esg_etf_comparison$ticker),
         multiple = FALSE,
         selected = '',
@@ -17900,47 +18782,51 @@ server <- function(input, output, session) {
   })
 
   # Optimisation des returns du stock, RF et Benchmark
+  # New version
   Returns_dt_new_ <- reactive({
-    # Vérification si aucun des éléments nécessaires n'est disponible
-    if (is.null(Data_return()) && is.null(RF_Data_return()) && is.null(BNC_return())) {
+    # Vérifier si au moins une source de données est disponible
+    has_data <- !is.null(RF_Data_return()) || !is.null(BNC_return()) || !is.null(Data_return())
+
+    if (!has_data) {
       return(
         highchart() %>%
           hc_title(text = "Select at least one security to display the chart")
       )
     }
 
-    # Préparation des données combinées non nulles
+    # Préparation des données combinées
     combined_data <- NULL
 
-
+    # Ajouter RF data si disponible
     if (!is.null(RF_Data_return())) {
       dt_rf <- RF_Data_return_after()
-      dt_rf$Ticker <- input$Rf_rate  # Identifier comme risk-free rate
+      dt_rf$Ticker <- input$Rf_rate
       dt_rf$Return <- dt_rf$Return * 100
       combined_data <- dt_rf
     }
 
+    # Ajouter Benchmark data si disponible
     if (!is.null(BNC_return())) {
       dt_bnc <- BNC_return_after()
-      dt_bnc$Ticker <- input$Benchmarks  # Identifier comme benchmark
+      dt_bnc$Ticker <- input$Benchmarks
       dt_bnc$Return <- dt_bnc$Return * 100
       combined_data <- rbind(combined_data, dt_bnc)
     }
 
+    # Ajouter Stock data si disponible
     if (!is.null(Data_return())) {
       dt <- Data_return_after()
-      dt$Ticker <- stock_to_analyze()  # Ajouter une colonne pour identifier la source
+      dt$Ticker <- stock_to_analyze()
       dt$Return <- round(dt$Return, 4) * 100
       combined_data <- rbind(combined_data, dt)
     }
 
-    # Vérification finale si des données combinées existent
-    if (is.null(combined_data) || nrow(combined_data) == 0) {
-      return(
-        highchart() %>%
-          hc_title(text = "Aucune donnée disponible pour afficher le graphique")
-      )
-    }
+    # Créer le sous-titre dynamiquement
+    subtitle_parts <- c()
+    if (!is.null(Data_return())) subtitle_parts <- c(subtitle_parts, stock_to_analyze())
+    if (!is.null(RF_Data_return())) subtitle_parts <- c(subtitle_parts, input$Rf_rate)
+    if (!is.null(BNC_return())) subtitle_parts <- c(subtitle_parts, input$Benchmarks)
+    subtitle <- paste("Comparaison entre", paste(subtitle_parts, collapse = ", "))
 
     # Création du graphique combiné
     return(
@@ -17953,15 +18839,78 @@ server <- function(input, output, session) {
         hc_tooltip(pointFormat = "{point.x: %Y-%m-%d} : {point.y:.4f}% ") %>%
         hc_yAxis(title = list(text = "Return (en %)")) %>%
         hc_title(text = paste0("Graphique comparatif : de ", input$date[1], " à ", input$date[2])) %>%
-        hc_subtitle(text = paste0("Comparaison entre ", stock_to_analyze(),
-                                  if (!is.null(RF_Data_return())) paste0(", ", input$Rf_rate) else "",
-                                  if (!is.null(BNC_return())) paste0(", ", input$Benchmarks) else "")) %>%
+        hc_subtitle(text = subtitle) %>%
         hc_exporting(
           enabled = TRUE,
           filename = paste0("Comparaison_returns_", input$date[1], "_", input$date[2])
         )
     )
   })
+
+  ## Optimisation des returns du stock, RF et Benchmark
+  # #old version
+  # Returns_dt_new_ <- reactive({
+  #   # Vérification si aucun des éléments nécessaires n'est disponible
+  #   if (is.null(Data_return()) && is.null(RF_Data_return()) && is.null(BNC_return())) {
+  #     return(
+  #       highchart() %>%
+  #         hc_title(text = "Select at least one security to display the chart")
+  #     )
+  #   }
+  #
+  #   # Préparation des données combinées non nulles
+  #   combined_data <- NULL
+  #
+  #
+  #   if (!is.null(RF_Data_return())) {
+  #     dt_rf <- RF_Data_return_after()
+  #     dt_rf$Ticker <- input$Rf_rate  # Identifier comme risk-free rate
+  #     dt_rf$Return <- dt_rf$Return * 100
+  #     combined_data <- dt_rf
+  #   }
+  #
+  #   if (!is.null(BNC_return())) {
+  #     dt_bnc <- BNC_return_after()
+  #     dt_bnc$Ticker <- input$Benchmarks  # Identifier comme benchmark
+  #     dt_bnc$Return <- dt_bnc$Return * 100
+  #     combined_data <- rbind(combined_data, dt_bnc)
+  #   }
+  #
+  #   if (!is.null(Data_return())) {
+  #     dt <- Data_return_after()
+  #     dt$Ticker <- stock_to_analyze()  # Ajouter une colonne pour identifier la source
+  #     dt$Return <- round(dt$Return, 4) * 100
+  #     combined_data <- rbind(combined_data, dt)
+  #   }
+  #
+  #   # Vérification finale si des données combinées existent
+  #   if (is.null(combined_data) || nrow(combined_data) == 0) {
+  #     return(
+  #       highchart() %>%
+  #         hc_title(text = "Aucune donnée disponible pour afficher le graphique")
+  #     )
+  #   }
+  #
+  #   # Création du graphique combiné
+  #   return(
+  #     combined_data %>%
+  #       hchart(
+  #         type = "line",
+  #         hcaes(x = Date, y = Return, group = Ticker)
+  #       ) %>%
+  #       hc_yAxis(opposite = FALSE, labels = list(format = "{value}%")) %>%
+  #       hc_tooltip(pointFormat = "{point.x: %Y-%m-%d} : {point.y:.4f}% ") %>%
+  #       hc_yAxis(title = list(text = "Return (en %)")) %>%
+  #       hc_title(text = paste0("Graphique comparatif : de ", input$date[1], " à ", input$date[2])) %>%
+  #       hc_subtitle(text = paste0("Comparaison entre ", stock_to_analyze(),
+  #                                 if (!is.null(RF_Data_return())) paste0(", ", input$Rf_rate) else "",
+  #                                 if (!is.null(BNC_return())) paste0(", ", input$Benchmarks) else "")) %>%
+  #       hc_exporting(
+  #         enabled = TRUE,
+  #         filename = paste0("Comparaison_returns_", input$date[1], "_", input$date[2])
+  #       )
+  #   )
+  # })
 
   # Old version
   # Returns_dt_new_ <- reactive({
@@ -19571,7 +20520,77 @@ server <- function(input, output, session) {
     }
   })
 
-
+# Nouvelle version à étudier voir
+  # sc_optimal <- reactive({
+  #   req(input$sc_question)
+  #
+  #   if (input$sc_question) {
+  #     # Vérification des données avant optimisation
+  #     if (input$benchmark) {
+  #       data <- St_rf_ESG()
+  #
+  #       if (is.null(data) || nrow(data) == 0) {
+  #         return(NULL)
+  #       }
+  #
+  #       # Conversion et vérification des données
+  #       data$Ticker_return <- as.numeric(data$Ticker_return)
+  #       data$Index_return <- as.numeric(data$Index_return)
+  #       data$ESG <- as.numeric(data$ESG)
+  #
+  #       # Vérification des valeurs manquantes
+  #       valid_data <- complete.cases(data$Ticker_return, data$Index_return, data$ESG)
+  #       if (sum(valid_data) == 0) {
+  #         return(NULL)
+  #       }
+  #
+  #       # Optimisation avec gestion d'erreur
+  #       tryCatch({
+  #         opt_result <- optimize(optimize_sc,
+  #                                interval = c(0, 1),
+  #                                returns = data$Ticker_return,
+  #                                rf = data$Index_return,
+  #                                esg = data$ESG,
+  #                                type_return = input$retfreq)
+  #         opt_result$minimum
+  #       }, error = function(e) {
+  #         NULL
+  #       })
+  #
+  #     } else {
+  #       data <- St_rf_ESG()
+  #       if (is.null(data) || nrow(data) == 0) {
+  #         return(NULL)
+  #       }
+  #
+  #       data$rf <- as.numeric(input$rfrate_new)
+  #
+  #       # Vérification et conversion des données
+  #       data$Ticker_return <- as.numeric(data$Ticker_return)
+  #       data$ESG <- as.numeric(data$ESG)
+  #
+  #       # Vérification des valeurs manquantes
+  #       valid_data <- complete.cases(data$Ticker_return, data$rf, data$ESG)
+  #       if (sum(valid_data) == 0) {
+  #         return(NULL)
+  #       }
+  #
+  #       tryCatch({
+  #         opt_result <- optimize(optimize_sc,
+  #                                interval = c(0, 1),
+  #                                returns = data$Ticker_return,
+  #                                rf = data$rf,
+  #                                esg = data$ESG,
+  #                                type_return = input$retfreq)
+  #         opt_result$minimum
+  #       }, error = function(e) {
+  #         NULL
+  #       })
+  #     }
+  #   } else {
+  #     as.numeric(input$sc)
+  #   }
+  # })
 
 
 
@@ -19711,3 +20730,4 @@ shinyApp(ui, server)
 
 
 # # https://finance.yahoo.com/quote/A/sustainability/
+
